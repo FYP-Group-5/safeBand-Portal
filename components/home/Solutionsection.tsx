@@ -8,7 +8,7 @@ const benefits = [
 
 export default function SolutionSection() {
   return (
-    <section className="py-24 bg-white/80" id="solution">
+    <section className="py-24 bg-[#f2f9f6]" id="solution">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
         {/* Image */}
         <div className="relative order-2 lg:order-1">
