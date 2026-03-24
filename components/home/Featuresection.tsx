@@ -49,7 +49,7 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section className="py-24 bg-warm-bg" id="features">
+    <section className="py-24 bg-[#f8faf9]" id="features">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
           {/* Sticky sidebar */}

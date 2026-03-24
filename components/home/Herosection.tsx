@@ -8,7 +8,7 @@ const avatars = [
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-[#E0F2F1] pt-16 pb-24 md:pt-24 md:pb-32">
+    <section className="relative overflow-hidden bg-[#f8faf9] pt-16 pb-24 md:pt-24 md:pb-32">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* Left — Copy */}
         <div className="flex flex-col gap-8">
@@ -18,8 +18,8 @@ export default function HeroSection() {
           </div>
 
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-slate-900 font-display">
-            Peace of mind for the{" "}
-            <span className="text-secondary">ones you love.</span>
+            Peace of mind for the 
+            <span className="text-secondary">{" "}ones you love.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-xl">
@@ -29,30 +29,15 @@ export default function HeroSection() {
           </p>
 
           <div className="flex flex-wrap gap-4 pt-4">
-            <button className="bg-primary text-white text-lg font-bold px-10 py-5 rounded-full shadow-xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
+            <button className="btn-primary flex items-center gap-2">
               Protect My Family <Heart className="w-5 h-5" />
             </button>
-            <button className="bg-white text-slate-700 border border-slate-200 text-lg font-bold px-10 py-5 rounded-full hover:bg-slate-50 transition-all">
+            <button  className="btn-secondary">
               Learn More
             </button>
           </div>
 
-          {/* Social proof */}
-          {/* <div className="flex items-center gap-4 pt-4">
-            <div className="flex -space-x-3">
-              {avatars.map((src, i) => (
-                <div
-                  key={i}
-                  className="w-10 h-10 rounded-full border-2 border-white bg-slate-200 overflow-hidden"
-                >
-                  <img src={src} alt="User" className="w-full h-full object-cover" />
-                </div>
-              ))}
-            </div>
-            <span className="text-sm font-medium text-slate-500">
-              Joined by 10,000+ families nationwide
-            </span>
-          </div> */}
+        
         </div>
 
         {/* Right — Illustration */}
