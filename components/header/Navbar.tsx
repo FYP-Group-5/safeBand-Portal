@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Shield, Menu, X } from "lucide-react";
+import InstallButton from "@/components/InstallButton";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -43,9 +44,9 @@ export default function Navbar() {
           <button className="text-sm font-bold text-primary px-5 py-2.5 rounded-full hover:bg-primary/5 transition-all">
             Login
           </button>
-          <button className="bg-primary text-white text-sm font-bold px-7 py-3 rounded-full shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+          <InstallButton size="md" showIcon={false}>
             Get Started
-          </button>
+          </InstallButton>
         </div>
 
         {/* Mobile controls */}
@@ -77,9 +78,9 @@ export default function Navbar() {
             <button className="text-sm font-bold text-primary px-5 py-2.5 rounded-full hover:bg-primary/5 transition-all text-left">
               Login
             </button>
-            <button className="bg-primary text-white text-sm font-bold px-7 py-3 rounded-full shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+            <InstallButton size="md" showIcon={false}>
               Get Started
-            </button>
+            </InstallButton>
           </div>
         </div>
       )}

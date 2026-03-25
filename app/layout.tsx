@@ -66,9 +66,8 @@ export default function RootLayout({
     <html lang="en" dir="ltr">
       <head>
         <meta name="apple-mobile-web-app-title" content="SafeBand" />
-        <meta name="mobile-wep-app-capable" content="yes" />
-        <meta name="apple-mobile-wep-app-capable" content="yes" />
-        <meta name="apple-mobile-wep-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

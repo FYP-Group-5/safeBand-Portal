@@ -1,4 +1,7 @@
+"use client";
+
 import { Heart, MapPin, AlertTriangle } from "lucide-react";
+import InstallButton from "@/components/InstallButton";
 
 const avatars = [
   "https://lh3.googleusercontent.com/aida-public/AB6AXuA4sZ-_1A8VMdG5XZd7XR-7S5u1lywkYBDylTTO2adBIxXuSp868DvTtNf9om2Mib16Ny0DccKTITUXyibR653Equ7wl-8THxkcjt4MXtehoSEBwPCgiDf9VnRdEYk3reH8KJMXDywsjR2o7yQ-eqM5Uh173DkPeJ5b3zIJfxympwFVvTzsrEunKNsvP-w0eDVLLkWyQorp7nwN3aHH8juFyefpgl7tQsi1f6gxvl8wJ6ilUs1n0kjQgmgkdPg3oZICA3B7ER8QAQ",
@@ -29,10 +32,10 @@ export default function HeroSection() {
           </p>
 
           <div className="flex flex-wrap gap-4 pt-4">
-            <button className="btn-primary flex items-center gap-2">
-              Protect My Family <Heart className="w-5 h-5" />
-            </button>
-            <button  className="btn-secondary">
+            <InstallButton size="lg" className="btn-primary">
+              Protect My Family
+            </InstallButton>
+            <button className="btn-secondary">
               Learn More
             </button>
           </div>

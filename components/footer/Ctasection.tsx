@@ -1,3 +1,7 @@
+"use client";
+
+import InstallButton from "@/components/InstallButton";
+
 export default function CtaSection() {
   return (
     <section className="py-24 bg-white">
@@ -22,9 +26,9 @@ export default function CtaSection() {
           </p>
 
           <div className="flex flex-col md:flex-row gap-6 justify-center relative z-10">
-            <button className="bg-white text-primary text-lg font-bold px-12 py-5 rounded-full shadow-2xl hover:scale-105 transition-all">
+            <InstallButton variant="white" size="lg">
               Start Your Free Protection
-            </button>
+            </InstallButton>
             <button className="bg-primary border border-white/30 text-white text-lg font-bold px-12 py-5 rounded-full hover:bg-white/10 transition-all">
               Watch the Demo
             </button>
