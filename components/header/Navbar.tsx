@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Shield, Menu, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -11,6 +12,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <header className="border-primary/5 sticky top-0 z-50 w-full border-b bg-white/70 backdrop-blur-lg transition-colors duration-300">
@@ -40,7 +42,10 @@ export default function Navbar() {
 
         {/* Desktop CTA */}
         <div className="hidden items-center gap-3 md:flex">
-          <button className="text-primary hover:bg-primary/5 rounded-full px-5 py-2.5 text-sm font-bold transition-all">
+          <button
+            onClick={() => router.push("/login")}
+            className="text-primary hover:bg-primary/5 rounded-full px-5 py-2.5 text-sm font-bold transition-all"
+          >
             Login
           </button>
           <button className="bg-primary shadow-primary/20 hover:bg-primary/90 rounded-full px-7 py-3 text-sm font-bold text-white shadow-lg transition-all">
