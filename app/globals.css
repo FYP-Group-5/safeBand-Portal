@@ -4,18 +4,24 @@
   --background: #ffffff;
   --foreground: #171717;
   --primary: #2c5b4c;
+  --primary-dark: #0b203c;
   --secondary: #8fb2a2;
   --neutral: #f2f7f5;
   --hero-background: #e0f2f1;
-  --background-light: "#f6f7f8";
+  --background-light: #f6f7f8;
+  --background-dark: #121820;
+  --emergency: #e10600;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-background-light: var(--background-light);
+  --color-background-dark: var(--background-dark);
+  --color-emergency: var(--emergency);
 
   --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
   --color-secondary: var(--secondary);
 
   --font-sans: var(--font-geist-sans);
