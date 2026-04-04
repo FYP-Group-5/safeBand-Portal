@@ -23,35 +23,35 @@ const problems = [
 
 export default function ProblemSection() {
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-secondary text-sm font-bold uppercase tracking-[0.2em] mb-4">
+    <section className="bg-white py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto mb-16 max-w-3xl text-center">
+          <h2 className="text-secondary mb-4 text-sm font-bold tracking-[0.2em] uppercase">
             The Worry
           </h2>
-          <h3 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 font-display">
+          <h3 className="font-display mb-8 text-4xl font-bold text-slate-900 md:text-5xl">
             When distance feels like a barrier.
           </h3>
-          <p className="text-xl text-slate-600 leading-relaxed">
+          <p className="text-xl leading-relaxed text-slate-600">
             We all worry about our children, elderly parents, or partners when
             we aren't together. Traditional tools can be slow or confusing
             during a moment of panic.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           {problems.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="bg-warm-bg p-10 rounded-[2rem] border border-primary/5 hover:border-secondary/20 transition-colors duration-200"
+              className="bg-warm-bg border-primary/5 hover:border-secondary/20 rounded-[2rem] border p-10 transition-colors duration-200"
             >
-              <div className="bg-secondary/10 w-16 h-16 rounded-2xl flex items-center justify-center text-secondary mb-8">
-                <Icon className="w-8 h-8" />
+              <div className="bg-secondary/10 text-secondary mb-8 flex h-16 w-16 items-center justify-center rounded-2xl">
+                <Icon className="h-8 w-8" />
               </div>
-              <h4 className="text-2xl font-bold text-slate-900 mb-4 font-display">
+              <h4 className="font-display mb-4 text-2xl font-bold text-slate-900">
                 {title}
               </h4>
-              <p className="text-slate-600 leading-relaxed">{description}</p>
+              <p className="leading-relaxed text-slate-600">{description}</p>
             </div>
           ))}
         </div>

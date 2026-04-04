@@ -1,8 +1,8 @@
 export default function CtaSection() {
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="bg-primary rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden">
+    <section className="bg-white py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="bg-primary relative overflow-hidden rounded-[3rem] p-12 text-center md:p-24">
           {/* Dot pattern overlay */}
           <div
             className="absolute inset-0 opacity-5"
@@ -13,19 +13,19 @@ export default function CtaSection() {
             }}
           />
 
-          <h2 className="text-white text-4xl md:text-5xl font-bold mb-8 relative z-10 font-display">
+          <h2 className="font-display relative z-10 mb-8 text-4xl font-bold text-white md:text-5xl">
             Protect what matters most.
           </h2>
-          <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-12 relative z-10 leading-relaxed">
+          <p className="relative z-10 mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl">
             Join the thousands of families using SafeBand to stay connected and
             safe. Because peace of mind shouldn't be complicated.
           </p>
 
-          <div className="flex flex-col md:flex-row gap-6 justify-center relative z-10">
-            <button className="bg-white text-primary text-lg font-bold px-12 py-5 rounded-full shadow-2xl hover:scale-105 transition-all">
+          <div className="relative z-10 flex flex-col justify-center gap-6 md:flex-row">
+            <button className="text-primary rounded-full bg-white px-12 py-5 text-lg font-bold shadow-2xl transition-all hover:scale-105">
               Start Your Free Protection
             </button>
-            <button className="bg-primary border border-white/30 text-white text-lg font-bold px-12 py-5 rounded-full hover:bg-white/10 transition-all">
+            <button className="bg-primary rounded-full border border-white/30 px-12 py-5 text-lg font-bold text-white transition-all hover:bg-white/10">
               Watch the Demo
             </button>
           </div>

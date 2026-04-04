@@ -1,4 +1,10 @@
-import { TouchpadOff, LocateFixed, Share2, Headphones, Smile } from "lucide-react";
+import {
+  TouchpadOff,
+  LocateFixed,
+  Share2,
+  Headphones,
+  Smile,
+} from "lucide-react";
 
 const steps = [
   {
@@ -35,35 +41,35 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section className="py-24 bg-white overflow-hidden" id="how-it-works">
-      <div className="max-w-7xl mx-auto px-6 text-center mb-20">
-        <h2 className="text-secondary text-sm font-bold uppercase tracking-[0.2em] mb-4">
+    <section className="overflow-hidden bg-white py-24" id="how-it-works">
+      <div className="mx-auto mb-20 max-w-7xl px-6 text-center">
+        <h2 className="text-secondary mb-4 text-sm font-bold tracking-[0.2em] uppercase">
           Connected &amp; Protected
         </h2>
-        <h3 className="text-4xl md:text-5xl font-bold text-slate-900 font-display">
+        <h3 className="font-display text-4xl font-bold text-slate-900 md:text-5xl">
           How SafeBand keeps you close
         </h3>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative">
+      <div className="relative mx-auto max-w-7xl px-6">
         {/* Connector line — desktop only */}
-        <div className="hidden lg:block absolute top-10 left-0 w-full px-32 z-0">
+        <div className="absolute top-10 left-0 z-0 hidden w-full px-32 lg:block">
           <div className="connection-line" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 relative z-10">
+        <div className="relative z-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           {steps.map(({ icon: Icon, badge, title, description }) => (
-            <div key={title} className="flex flex-col items-center group">
-              <div className="w-20 h-20 rounded-full bg-white border-4 border-accent-blue flex items-center justify-center text-secondary mb-6 group-hover:scale-110 transition-transform soft-shadow">
-                <Icon className="w-7 h-7" />
+            <div key={title} className="group flex flex-col items-center">
+              <div className="border-accent-blue text-secondary soft-shadow mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 bg-white transition-transform group-hover:scale-110">
+                <Icon className="h-7 w-7" />
               </div>
-              <div className="bg-secondary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-4">
+              <div className="bg-secondary mb-4 rounded-full px-3 py-1 text-[10px] font-bold tracking-widest text-white uppercase">
                 {badge}
               </div>
-              <h4 className="font-bold text-slate-900 mb-2 font-display">
+              <h4 className="font-display mb-2 font-bold text-slate-900">
                 {title}
               </h4>
-              <p className="text-sm text-slate-600 text-center px-4">
+              <p className="px-4 text-center text-sm text-slate-600">
                 {description}
               </p>
             </div>

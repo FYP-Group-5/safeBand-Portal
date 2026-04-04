@@ -49,38 +49,38 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section className="py-24 bg-[#f8faf9]" id="features">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
+    <section className="bg-[#f8faf9] py-24" id="features">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-3">
           {/* Sticky sidebar */}
           <div className="lg:sticky lg:top-32">
-            <h2 className="text-secondary text-sm font-bold uppercase tracking-[0.2em] mb-4">
+            <h2 className="text-secondary mb-4 text-sm font-bold tracking-[0.2em] uppercase">
               Full Protection
             </h2>
-            <h3 className="text-4xl font-bold text-slate-900 mb-6 font-display">
+            <h3 className="font-display mb-6 text-4xl font-bold text-slate-900">
               Engineered for unconditional safety.
             </h3>
-            <p className="text-slate-700 leading-relaxed mb-8">
+            <p className="mb-8 leading-relaxed text-slate-700">
               Every feature of SafeBand has been crafted to remove barriers to
               connection when it matters most.
             </p>
-            <button className="bg-primary text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/10">
-              View Technical Details <ArrowUpRight className="w-4 h-4" />
+            <button className="bg-primary hover:bg-primary/90 shadow-primary/10 flex items-center gap-2 rounded-full px-8 py-4 font-bold text-white shadow-lg transition-all">
+              View Technical Details <ArrowUpRight className="h-4 w-4" />
             </button>
           </div>
 
           {/* Feature cards grid */}
-          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:col-span-2">
             {features.map(({ icon: Icon, title, description }) => (
               <div
                 key={title}
-                className="p-10 rounded-[2.5rem] bg-white border border-primary/5 hover:border-secondary/20 transition-all soft-shadow"
+                className="border-primary/5 hover:border-secondary/20 soft-shadow rounded-[2.5rem] border bg-white p-10 transition-all"
               >
-                <Icon className="w-8 h-8 text-secondary mb-6" />
-                <h4 className="text-xl font-bold text-slate-900 mb-3 font-display">
+                <Icon className="text-secondary mb-6 h-8 w-8" />
+                <h4 className="font-display mb-3 text-xl font-bold text-slate-900">
                   {title}
                 </h4>
-                <p className="text-slate-600 leading-relaxed">{description}</p>
+                <p className="leading-relaxed text-slate-600">{description}</p>
               </div>
             ))}
           </div>
