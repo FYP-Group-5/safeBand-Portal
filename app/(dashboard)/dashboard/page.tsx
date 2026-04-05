@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Shield,
   Bell,
   MapPin,
   Home,
-  Map,
   Settings,
   Timer,
   Users,
   ShieldCheck,
   Hand,
   LayoutGrid,
-  UserRound,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -146,82 +145,54 @@ export default function DashboardPage() {
 
       {/* Bottom Navigation Bar */}
       <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white px-6 py-3">
-        <div className="mx-auto flex max-w-md items-center justify-between">
-          <button
-            onClick={() => setActiveNav("dash")}
-            className={`flex flex-col items-center gap-1 ${
-              activeNav === "dash"
-                ? "text-primary-dark"
-                : "hover:text-primary-dark text-gray-400"
-            } transition-colors`}
-          >
-            <LayoutGrid className="h-6 w-6" />
-            <span className="text-[10px] font-bold tracking-widest uppercase">
-              Dash
-            </span>
-          </button>
+        <div className="mx-auto flex max-w-md items-center justify-around">
+          <Link href="/dashboard" className="flex flex-col items-center gap-1">
+            <button
+              onClick={() => setActiveNav("dash")}
+              className={`flex flex-col items-center gap-1 ${
+                activeNav === "dash"
+                  ? "text-primary-dark"
+                  : "hover:text-primary-dark text-gray-400"
+              } transition-colors`}
+            >
+              <LayoutGrid className="h-6 w-6" />
+              <span className="text-[10px] font-bold tracking-widest uppercase">
+                Home
+              </span>
+            </button>
+          </Link>
 
-          <button
-            onClick={() => setActiveNav("map")}
-            className={`flex flex-col items-center gap-1 ${
-              activeNav === "map"
-                ? "text-primary-dark"
-                : "hover:text-primary-dark text-gray-400"
-            } transition-colors`}
-          >
-            <Map className="h-6 w-6" />
-            <span className="text-[10px] font-medium tracking-widest uppercase">
-              Safe Map
-            </span>
-          </button>
+          <Link href="/responders" className="flex flex-col items-center gap-1">
+            <button
+              onClick={() => setActiveNav("responders")}
+              className={`flex flex-col items-center gap-1 ${
+                activeNav === "responders"
+                  ? "text-primary-dark"
+                  : "hover:text-primary-dark text-gray-400"
+              } transition-colors`}
+            >
+              <Users className="h-6 w-6" />
+              <span className="text-[10px] font-medium tracking-widest uppercase">
+                Responders
+              </span>
+            </button>
+          </Link>
 
-          <button
-            onClick={() => setActiveNav("responders")}
-            className={`flex flex-col items-center gap-1 ${
-              activeNav === "responders"
-                ? "text-primary-dark"
-                : "hover:text-primary-dark text-gray-400"
-            } transition-colors`}
-          >
-            <Users className="h-6 w-6" />
-            <span className="text-[10px] font-medium tracking-widest uppercase">
-              Responders
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveNav("settings")}
-            className={`flex flex-col items-center gap-1 ${
-              activeNav === "settings"
-                ? "text-primary-dark"
-                : "hover:text-primary-dark text-gray-400"
-            } transition-colors`}
-          >
-            <Settings className="h-6 w-6" />
-            <span className="text-[10px] font-medium tracking-widest uppercase">
-              Settings
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveNav("profile")}
-            className={`flex flex-col items-center gap-1 ${
-              activeNav === "profile"
-                ? "text-primary-dark"
-                : "hover:text-primary-dark text-gray-400"
-            } transition-colors`}
-          >
-            <div className="h-6 w-6 overflow-hidden rounded-full border-2 border-transparent">
-              <img
-                className="h-full w-full object-cover"
-                alt="User profile avatar"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNb6b3CDXnIae7Wp_qOlP2YW9B1B7S9FAESRQAxpdaugQs-UTXLzDCclBphtyaELKtn7MzyFzGfWyh48ukQhIq7H_4x2Mc41QGynQeTATuUuSXinHMLeNnZJlWWpu-jfSYjjqwbUh3ERX3GFVuxNloQgktLz2c6QiYvYR9K3FAQzfcH7EZTtD9VnHDrYA5Wa5qvekeBkuD3hhXB_sTpP-DkjCdLwsI4w67Cq2Ye3U5-CC6EH-qXcsZSV5XW2z3lM7ERvZefMlAAw"
-              />
-            </div>
-            <span className="text-[10px] font-medium tracking-widest uppercase">
-              Profile
-            </span>
-          </button>
+          <Link href="/settings" className="flex flex-col items-center gap-1">
+            <button
+              onClick={() => setActiveNav("settings")}
+              className={`flex flex-col items-center gap-1 ${
+                activeNav === "settings"
+                  ? "text-primary-dark"
+                  : "hover:text-primary-dark text-gray-400"
+              } transition-colors`}
+            >
+              <Settings className="h-6 w-6" />
+              <span className="text-[10px] font-medium tracking-widest uppercase">
+                Settings
+              </span>
+            </button>
+          </Link>
         </div>
       </nav>
     </section>
