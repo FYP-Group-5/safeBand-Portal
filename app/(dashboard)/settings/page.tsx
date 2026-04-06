@@ -14,15 +14,11 @@ import {
   HelpCircle,
   LogOut,
   ChevronRight,
-  LayoutGrid,
-  Users,
-  Settings,
 } from "lucide-react";
 import Link from "next/link";
+import BottomNavigation from "../components/BottomNavigation";
 
 export default function SettingsPage() {
-  const [activeNav, setActiveNav] = useState("settings");
-
   const settingsSections = [
     {
       title: "Account",
@@ -160,57 +156,7 @@ export default function SettingsPage() {
       </main>
 
       {/* Bottom Navigation (Mobile) */}
-      <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-slate-200 bg-white md:hidden">
-        <div className="flex justify-around px-6 py-3">
-          <Link href="/dashboard" className="flex flex-col items-center gap-1">
-            <button
-              onClick={() => setActiveNav("dash")}
-              className={`flex flex-col items-center gap-1 ${
-                activeNav === "dash"
-                  ? "text-primary-dark"
-                  : "hover:text-primary-dark text-gray-400"
-              } transition-colors`}
-            >
-              <LayoutGrid className="h-6 w-6" />
-              <span className="text-[10px] font-bold tracking-widest uppercase">
-                Home
-              </span>
-            </button>
-          </Link>
-
-          <Link href="/responders" className="flex flex-col items-center gap-1">
-            <button
-              onClick={() => setActiveNav("responders")}
-              className={`flex flex-col items-center gap-1 ${
-                activeNav === "responders"
-                  ? "text-primary-dark"
-                  : "hover:text-primary-dark text-gray-400"
-              } transition-colors`}
-            >
-              <Users className="h-6 w-6" />
-              <span className="text-[10px] font-medium tracking-widest uppercase">
-                Responders
-              </span>
-            </button>
-          </Link>
-
-          <Link href="/settings" className="flex flex-col items-center gap-1">
-            <button
-              onClick={() => setActiveNav("settings")}
-              className={`flex flex-col items-center gap-1 ${
-                activeNav === "settings"
-                  ? "text-primary-dark"
-                  : "hover:text-primary-dark text-gray-400"
-              } transition-colors`}
-            >
-              <Settings className="h-6 w-6" />
-              <span className="text-[10px] font-medium tracking-widest uppercase">
-                Settings
-              </span>
-            </button>
-          </Link>
-        </div>
-      </nav>
+      <BottomNavigation initialActive="settings" />
     </section>
   );
 }
