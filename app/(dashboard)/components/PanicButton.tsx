@@ -5,7 +5,7 @@ export default function PanicButton() {
     <div className="flex flex-col items-center justify-center py-8">
       <div className="group relative cursor-pointer">
         {/* Inner Red Button */}
-        <button className="bg-emergency relative z-10 flex h-64 w-64 flex-col items-center justify-center rounded-full text-white shadow-2xl transition-transform active:scale-95">
+        <button className="bg-emergency relative z-10 flex h-64 w-64 flex-col items-center justify-center rounded-full text-white shadow-2xl shadow-[0_0_0_10px_rgba(225,6,0,0.1),0_0_0_20px_rgba(225,6,0,0.05)] transition-transform active:scale-95">
           <Home className="mb-2 h-16 w-16 font-light" />
           <span className="text-2xl font-black tracking-tighter">
             TAP TO ALERT
