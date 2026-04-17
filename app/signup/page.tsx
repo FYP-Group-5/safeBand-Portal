@@ -15,6 +15,7 @@ import {
   LockKeyhole,
   Info,
 } from "lucide-react";
+import Input from "@/components/ui/Input";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,14 +34,14 @@ export default function SignupPage() {
   const passwordStrength = getPasswordStrength(password);
 
   return (
-    <section className="flex min-h-screen flex-col bg-background-light font-sans">
+    <section className="bg-background-light flex min-h-screen flex-col font-sans">
       {/* Top Navigation */}
-      <header className="border-primary-dark/10 bg-background-dark/50 flex items-center justify-between border-b bg-white px-6 py-4 md:px-10">
+      <header className="border-primary-dark/10 flex items-center justify-between border-b bg-white px-6 py-4 md:px-10">
         <Link href="/" className="text-primary-dark flex items-center gap-3">
           <div className="bg-primary-dark flex size-8 items-center justify-center rounded-lg text-white">
             <Shield className="h-5 w-5" />
           </div>
-          <h2 className="text-primary-dark text-xl font-bold leading-tight tracking-tight">
+          <h2 className="text-primary-dark text-xl leading-tight font-bold tracking-tight">
             SafeBand
           </h2>
         </Link>
@@ -48,17 +49,18 @@ export default function SignupPage() {
           <span className="hidden text-sm text-slate-500 md:block">
             Already have an account?
           </span>
-          <Link href="/login">
-            <button className="border-primary-dark text-primary-dark hover:bg-primary-dark/5 flex h-10 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg border px-4 text-sm font-bold transition-colors">
-              <span className="truncate">Login</span>
-            </button>
+          <Link
+            href="/login"
+            className="border-primary-dark text-primary-dark hover:bg-primary-dark/5 flex h-10 min-w-21 cursor-pointer items-center justify-center overflow-hidden rounded-lg border px-4 text-sm font-bold transition-colors"
+          >
+            Login
           </Link>
         </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex flex-1 items-center justify-center bg-gradient-to-b from-white to-background-light p-6">
-        <div className="border-primary-dark/5 shadow-primary-dark/5 w-full max-w-[500px] overflow-hidden rounded-xl border bg-white shadow-xl">
+      <main className="to-background-light flex flex-1 items-center justify-center bg-linear-to-b from-white p-6">
+        <div className="border-primary-dark/5 shadow-primary-dark/5 w-full max-w-125 overflow-hidden rounded-xl border bg-white shadow-xl">
           {/* Hero Header in Card */}
           <div className="relative h-32 w-full overflow-hidden">
             <div className="bg-primary-dark absolute inset-0 opacity-90"></div>
@@ -68,7 +70,7 @@ export default function SignupPage() {
                 Secure your safety network in minutes.
               </p>
             </div>
-            <div className="absolute right-0 top-0 h-full w-1/3 opacity-20">
+            <div className="absolute top-0 right-0 h-full w-1/3 opacity-20">
               <img
                 className="h-full w-full object-cover"
                 alt="Abstract deep blue geometric wave pattern"
@@ -79,87 +81,74 @@ export default function SignupPage() {
 
           {/* Form Container */}
           <div className="space-y-5 p-8">
-            {/* Full Name */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-primary-dark flex items-center gap-1 text-sm font-semibold">
-                Full Name <span className="text-emergency">*</span>
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <input
-                  className="focus:border-primary-dark focus:ring-primary-dark/20 w-full rounded-lg border border-slate-200 bg-background-light py-3 pl-10 pr-4 text-primary-dark outline-none transition-all placeholder:text-slate-400 focus:ring-2"
-                  placeholder="Jane Doe"
-                  type="text"
-                  value={fullName}
-                  onInput={(e) => {
-                    setFullName((e.target as any).value);
-                  }}
-                />
-              </div>
-            </div>
+            <Input
+              label={
+                <>
+                  Full Name <span className="text-emergency">*</span>
+                </>
+              }
+              type="text"
+              placeholder="Jane Doe"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              icon={User}
+            />
 
-            {/* Email Address */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-primary-dark flex items-center gap-1 text-sm font-semibold">
-                Email Address <span className="text-emergency">*</span>
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <input
-                  className="focus:border-primary-dark focus:ring-primary-dark/20 w-full rounded-lg border border-slate-200 bg-background-light py-3 pl-10 pr-4 text-primary-dark outline-none transition-all placeholder:text-slate-400 focus:ring-2"
-                  placeholder="jane@example.com"
-                  type="email"
-                  value={email}
-                  onInput={(e) => setEmail((e.target as any).value)}
-                />
-              </div>
-            </div>
+            <Input
+              label={
+                <>
+                  Email Address <span className="text-emergency">*</span>
+                </>
+              }
+              type="email"
+              placeholder="jane@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              icon={Mail}
+            />
 
-            {/* Phone Number */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-primary-dark flex items-center justify-between gap-1 text-sm font-semibold">
-                <span>
+            <Input
+              label={
+                <>
                   Phone Number <span className="text-emergency">*</span>
-                </span>
-                <span className="bg-emergency/10 text-emergency rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                </>
+              }
+              labelRight={
+                <span className="bg-emergency/10 text-emergency rounded px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase">
                   Critical
                 </span>
-              </label>
-              <div className="relative">
-                <Smartphone className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <input
-                  className="focus:border-primary-dark focus:ring-primary-dark/20 w-full rounded-lg border border-slate-200 bg-background-light py-3 pl-10 pr-4 text-primary-dark outline-none transition-all placeholder:text-slate-400 focus:ring-2"
-                  placeholder="+1 (555) 000-0000"
-                  type="tel"
-                  value={phone}
-                  onInput={(e) => setPhone((e.target as any).value)}
-                />
-              </div>
-              <p className="mt-1 flex items-start gap-1 text-[11px] text-slate-500">
-                <Info className="text-emergency mt-0.5 h-4 w-4" />
-                Required for instant emergency SMS alerts and live location
-                sharing.
-              </p>
-            </div>
+              }
+              type="tel"
+              placeholder="+1 (555) 000-0000"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              icon={Smartphone}
+              helperText={
+                <p className="flex items-start gap-1 text-[11px] text-slate-500">
+                  <Info className="text-emergency mt-0.5 h-4 w-4 shrink-0" />
+                  Required for instant emergency SMS alerts and live location
+                  sharing.
+                </p>
+              }
+            />
 
-            {/* Password */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-primary-dark flex items-center gap-1 text-sm font-semibold">
-                Password <span className="text-emergency">*</span>
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <input
-                  className="focus:border-primary-dark focus:ring-primary-dark/20 w-full rounded-lg border border-slate-200 bg-background-light py-3 pl-10 pr-12 text-primary-dark outline-none transition-all placeholder:text-slate-400 focus:ring-2"
-                  placeholder="••••••••••••"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onInput={(e) => setPassword((e.target as any).value)}
-                />
+            <Input
+              label={
+                <>
+                  Password <span className="text-emergency">*</span>
+                </>
+              }
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              icon={Lock}
+              rightElement={
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="hover:text-primary-dark absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors"
+                  className="hover:text-primary-dark text-slate-400 transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -167,24 +156,29 @@ export default function SignupPage() {
                     <Eye className="h-5 w-5" />
                   )}
                 </button>
-              </div>
-              {password && (
-                <div className="mt-1 flex gap-1">
-                  <div className="h-1 flex-1 overflow-hidden rounded-full bg-slate-200">
-                    <div
-                      className="bg-primary-dark h-full rounded-full transition-all duration-300"
-                      style={{ width: passwordStrength.width }}
-                    ></div>
+              }
+              helperText={
+                password ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-slate-200">
+                      <div
+                        className="bg-primary-dark h-full rounded-full transition-all duration-300"
+                        style={{ width: passwordStrength.width }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-medium text-slate-500">
+                      {passwordStrength.label}
+                    </span>
                   </div>
-                  <span className="text-[10px] font-medium text-slate-500">
-                    {passwordStrength.label}
-                  </span>
-                </div>
-              )}
-            </div>
+                ) : null
+              }
+            />
 
             {/* Sign Up Button */}
-            <button className="bg-primary-dark shadow-primary-dark/20 hover:bg-primary-dark/90 mt-4 flex w-full items-center justify-center gap-2 rounded-lg py-4 text-base font-bold text-white shadow-lg transition-all active:scale-[0.98]">
+            <button
+              type="submit"
+              className="bg-primary-dark shadow-primary-dark/20 hover:bg-primary-dark/90 mt-4 flex w-full items-center justify-center gap-2 rounded-lg py-4 text-base font-bold text-white shadow-lg transition-all active:scale-[0.98]"
+            >
               Create Account
               <ArrowRight className="h-5 w-5" />
             </button>
@@ -202,7 +196,7 @@ export default function SignupPage() {
 
             {/* Trust Footer */}
             <div className="border-t border-slate-100 pt-6 text-center">
-              <div className="mb-3 flex items-center justify-center gap-4 contrast-125 grayscale opacity-50">
+              <div className="mb-3 flex items-center justify-center gap-4 opacity-50 contrast-125 grayscale">
                 <ShieldCheck className="h-6 w-6" />
                 <Lock className="h-6 w-6" />
                 <LockKeyhole className="h-6 w-6" />
@@ -228,8 +222,8 @@ export default function SignupPage() {
 
       {/* Simple Footer */}
       <footer className="px-10 py-6 text-center">
-        <p className="text-xs font-medium uppercase tracking-widest text-slate-400">
-          © 2024 SafeBand Security Systems. All Rights Reserved.
+        <p className="text-xs font-medium tracking-widest text-slate-400 uppercase">
+          &copy; 2024 SafeBand Security Systems. All Rights Reserved.
         </p>
       </footer>
     </section>

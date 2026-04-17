@@ -18,7 +18,7 @@ export default function CtaSection() {
           </h2>
           <p className="relative z-10 mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl">
             Join the thousands of families using SafeBand to stay connected and
-            safe. Because peace of mind shouldn't be complicated.
+            safe. Because peace of mind shouldn&apos;t be complicated.
           </p>
 
           <div className="relative z-10 flex flex-col justify-center gap-6 md:flex-row">

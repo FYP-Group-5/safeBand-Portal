@@ -16,7 +16,7 @@ export default function SolutionSection() {
             <img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTjLxHbO3RSGWeTTyieEMp2y6NNXjltIE5DIPNNFDYR6nA5mlHYDNUj2Jso7M_IWBCL0W4gPkCX3ZySzdPIVFtHOQMU_UoHHFM54CM5srwl93PQT8wZ2JfL6Y1gL7tQoALOH-oYeyRgtnsWJRPQtNxqlJVk4Kwpv8VQD8BWqaFlT7NY__AIMT72JwvQOit1rzWjilCSBeNAGnM-ilcy3ZmKm1ujjGWReeU_BMhHdnRGrHbFkEdawcoloJdsf2ruglSL0wy8VgUlg"
               alt="SafeBand App UI"
-              className="h-auto w-full rounded-[2rem]"
+              className="h-auto w-full rounded-4xl"
             />
           </div>
 
@@ -43,16 +43,16 @@ export default function SolutionSection() {
             Technology that feels like a hug.
           </h3>
           <p className="text-lg leading-relaxed text-slate-700">
-            SafeBand isn't just an alert system; it's a bridge between you and
-            your family. We've built a high-performance Progressive Web App
-            that's accessible from any device, instantly, without needing a
-            heavy install.
+            SafeBand isn&apos;t just an alert system; it&apos;s a bridge between
+            you and your family. We&apos;ve built a high-performance Progressive
+            Web App that&apos;s accessible from any device, instantly, without
+            needing a heavy install.
           </p>
 
           <div className="space-y-6">
             {benefits.map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-4">
-                <div className="text-secondary flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
+                <div className="text-secondary flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
                   <Icon className="h-5 w-5" />
                 </div>
                 <p className="font-medium text-slate-600">{text}</p>

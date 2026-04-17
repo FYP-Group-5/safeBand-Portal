@@ -60,7 +60,7 @@ export default function HowItWorksSection() {
         <div className="relative z-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           {steps.map(({ icon: Icon, badge, title, description }) => (
             <div key={title} className="group flex flex-col items-center">
-              <div className="border-accent-blue text-secondary soft-shadow mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 bg-white transition-transform group-hover:scale-110">
+              <div className="border-secondary text-secondary soft-shadow mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 bg-white transition-transform group-hover:scale-110">
                 <Icon className="h-7 w-7" />
               </div>
               <div className="bg-secondary mb-4 rounded-full px-3 py-1 text-[10px] font-bold tracking-widest text-white uppercase">

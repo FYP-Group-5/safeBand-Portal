@@ -1,6 +1,5 @@
 import {
   ArrowLeft,
-  Settings as SettingsIcon,
   User,
   Bell,
   Shield,
@@ -13,7 +12,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
-import BottomNavigation from "../components/BottomNavigation";
 
 export default function SettingsPage() {
   const settingsSections = [
@@ -96,7 +94,7 @@ export default function SettingsPage() {
       </header>
 
       <main className="flex flex-1 justify-center px-4 py-8 md:px-10 lg:px-40">
-        <div className="flex w-full max-w-[960px] flex-col gap-8">
+        <div className="flex w-full max-w-240 flex-col gap-8">
           {/* Profile Card */}
           <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="bg-primary-dark flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-bold text-white">
@@ -151,9 +149,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </main>
-
-      {/* Bottom Navigation (Mobile) */}
-      <BottomNavigation initialActive="settings" />
     </section>
   );
 }

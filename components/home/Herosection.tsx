@@ -1,11 +1,5 @@
 import { Heart, MapPin, AlertTriangle } from "lucide-react";
 
-const avatars = [
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuA4sZ-_1A8VMdG5XZd7XR-7S5u1lywkYBDylTTO2adBIxXuSp868DvTtNf9om2Mib16Ny0DccKTITUXyibR653Equ7wl-8THxkcjt4MXtehoSEBwPCgiDf9VnRdEYk3reH8KJMXDywsjR2o7yQ-eqM5Uh173DkPeJ5b3zIJfxympwFVvTzsrEunKNsvP-w0eDVLLkWyQorp7nwN3aHH8juFyefpgl7tQsi1f6gxvl8wJ6ilUs1n0kjQgmgkdPg3oZICA3B7ER8QAQ",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBJWbnqDPdjq8E7myGUh2a-vnSTziufj2WiU3Pc9jCdX-txbyytj3LasJNJUve6eRNAP3s1EAVkH7xqbWm9zLRn9B6nmMIRM0tnQhNL-2Uz-qrb3cb9J7pFmCYsegOOFsAMjOM_czoJir9pvJerKqtIawVTu_n3GmzNw59nyQmCZ6Gl3JOR40J7gY2ZWRGZSSCx12m18achcu_74kelwIDa9tXJanFhDpm1TNDhOjgDqRoG7lrxwlf3PuqQNs3AsmR5gwtTKbAc4g",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuC0feOaFOIQEBafk9CS9v2ZCFIUdzc7Nf87Gyi7rGRNypMbdgP0tIQ5JPrMsO12PM5RSKbFTx4xn1Dwo2XDGgw9JFxse4h3wHW6JxkwEfSCmtrjUxa8R0EBYBJHx-XvYkupORCWj5BlZIhLwPFSYWv3CjuW6r_-H0ecXjJuSxeovaxYDeUQ8MumS0FKgKoc7_S4rk9dlCk-9I_tOGOWhWQVuE-jKXFDlAxVBLYeXI-NbSuT6MeNKn068_mAIto86px8t2UTJ9K5GQ",
-];
-
 export default function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-[#f8faf9] pt-16 pb-24 md:pt-24 md:pb-32">
@@ -45,12 +39,12 @@ export default function HeroSection() {
               className="h-auto w-full rounded-[2.5rem] object-cover"
             />
             {/* Location badge */}
-            <div className="bg-secondary soft-shadow absolute -bottom-8 -left-8 max-w-[200px] rounded-3xl p-6 text-white">
+            <div className="bg-secondary soft-shadow absolute -bottom-8 -left-8 max-w-50 rounded-3xl p-6 text-white">
               <MapPin className="mb-2 h-8 w-8" />
               <p className="text-sm font-bold">Grandma is safe at home</p>
             </div>
             {/* Emergency badge */}
-            <div className="bg-emergency-red soft-shadow absolute -top-6 -right-6 animate-bounce rounded-full p-5 text-white">
+            <div className="bg-emergency soft-shadow absolute -top-6 -right-6 animate-bounce rounded-full p-5 text-white">
               <AlertTriangle className="h-7 w-7" />
             </div>
           </div>

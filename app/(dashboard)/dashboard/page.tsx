@@ -4,7 +4,6 @@ import LocationCard from "../components/LocationCard";
 import PanicButton from "../components/PanicButton";
 import QuickActionCard from "../components/QuickActionCard";
 import StatusCard from "../components/StatusCard";
-import BottomNavigation from "../components/BottomNavigation";
 
 export default function DashboardPage() {
   const mapImageUrl =
@@ -14,7 +13,6 @@ export default function DashboardPage() {
     <section className="text-primary-dark bg-background-light flex min-h-screen flex-col overflow-x-hidden font-sans">
       <DashboardHeader />
 
-      {/* Main Content Container - Fixed overflow */}
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-24">
         <LocationCard
           address="123 Main St, New York, NY"
@@ -44,8 +42,6 @@ export default function DashboardPage() {
 
         <StatusCard />
       </main>
-
-      <BottomNavigation initialActive="dash" showOnDesktop={true} />
     </section>
   );
 }

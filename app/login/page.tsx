@@ -11,6 +11,7 @@ import {
   LogIn,
   ShieldCheck,
 } from "lucide-react";
+import Input from "@/components/ui/Input";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,61 +47,43 @@ export default function LoginPage() {
             </div>
 
             <form className="space-y-5">
-              {/* Email Field */}
-              <div className="space-y-2">
-                <label
-                  className="text-primary-dark/80 text-sm font-semibold"
-                  htmlFor="email"
-                >
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                  <input
-                    className="focus:border-primary-dark focus:ring-primary-dark w-full rounded-lg border border-slate-200 bg-background-light py-3 pl-10 pr-4 outline-none transition-all focus:ring-2"
-                    id="email"
-                    name="email"
-                    placeholder="name@company.com"
-                    required
-                    type="email"
-                    value={email}
-                    onInput={(e) => setEmail((e.target as any).value)}
-                  />
-                </div>
-              </div>
+              <Input
+                id="email"
+                name="email"
+                label="Email Address"
+                type="email"
+                placeholder="name@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                icon={Mail}
+                required
+              />
 
-              {/* Password Field */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label
-                    className="text-primary-dark/80 text-sm font-semibold"
-                    htmlFor="password"
-                  >
-                    Password
-                  </label>
+              <Input
+                id="password"
+                name="password"
+                label="Password"
+                labelRight={
                   <Link
                     className="hover:text-accent-red text-primary-dark text-xs font-medium transition-colors"
                     href="#"
                   >
                     Forgot Password?
                   </Link>
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                  <input
-                    className="focus:border-primary-dark focus:ring-primary-dark w-full rounded-lg border border-slate-200 bg-background-light py-3 pl-10 pr-12 outline-none transition-all focus:ring-2"
-                    id="password"
-                    name="password"
-                    placeholder="••••••••"
-                    required
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onInput={(e) => setPassword((e.target as any).value)}
-                  />
+                }
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                icon={Lock}
+                rightElement={
                   <button
-                    className="hover:text-primary-dark absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors"
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    className="hover:text-primary-dark text-slate-400 transition-colors"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -108,10 +91,10 @@ export default function LoginPage() {
                       <Eye className="h-5 w-5" />
                     )}
                   </button>
-                </div>
-              </div>
+                }
+                required
+              />
 
-              {/* Login Button */}
               <button
                 className="bg-primary-dark hover:bg-primary-dark/90 flex w-full transform items-center justify-center gap-2 rounded-lg py-3.5 font-bold text-white shadow-md transition-all hover:shadow-lg active:scale-[0.98]"
                 type="submit"
@@ -136,9 +119,9 @@ export default function LoginPage() {
             {/* Create Account */}
             <div className="text-center">
               <p className="text-sm text-slate-600">
-                Don't have an account yet?
+                Don&apos;t have an account yet?{" "}
                 <Link
-                  className="decoration-emergency text-primary-dark ml-1 font-bold decoration-2 underline-offset-4 hover:underline"
+                  className="decoration-emergency text-primary-dark font-bold decoration-2 underline-offset-4 hover:underline"
                   href="/signup"
                 >
                   Create an account
@@ -148,7 +131,7 @@ export default function LoginPage() {
           </div>
 
           {/* Bottom Accent Bar */}
-          <div className="via-emergency to-primary-dark from-primary-dark h-1.5 w-full bg-gradient-to-r"></div>
+          <div className="via-emergency to-primary-dark from-primary-dark h-1.5 w-full bg-linear-to-r"></div>
         </div>
 
         {/* Footer Info */}

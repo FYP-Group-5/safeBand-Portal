@@ -1,6 +1,5 @@
 import {
   ArrowLeft,
-  Shield,
   Phone,
   Mail,
   Edit,
@@ -10,7 +9,6 @@ import {
   Clock,
 } from "lucide-react";
 import Link from "next/link";
-import BottomNavigation from "../components/BottomNavigation";
 import { AddResponderButton } from "../components/AddResponderButton";
 
 export default function RespondersPage() {
@@ -50,20 +48,15 @@ export default function RespondersPage() {
     <section className="bg-background-light relative flex min-h-screen w-full flex-col pb-20 md:pb-0">
       {/* Top Navigation Bar */}
       <header className="border-primary-dark/10 flex items-center justify-between border-b bg-white px-6 py-4 md:px-10 lg:px-40">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Link href="/dashboard">
             <button className="text-primary-dark hover:bg-primary-dark/5 flex h-10 w-10 items-center justify-center rounded-lg transition-colors">
               <ArrowLeft className="h-5 w-5" />
             </button>
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="text-primary-dark h-8 w-8">
-              <Shield className="h-full w-full" />
-            </div>
-            <h1 className="text-primary-dark text-xl font-bold tracking-tight">
-              Responders
-            </h1>
-          </div>
+          <h1 className="text-primary-dark text-xl font-bold tracking-tight">
+            Responders
+          </h1>
         </div>
         <div className="hidden md:block">
           <AddResponderButton />
@@ -71,7 +64,7 @@ export default function RespondersPage() {
       </header>
 
       <main className="flex flex-1 justify-center px-4 py-8 md:px-10 lg:px-40">
-        <div className="flex max-w-[960px] flex-1 flex-col gap-6">
+        <div className="flex max-w-240 flex-1 flex-col gap-6">
           {/* Mobile Add Button */}
           <div className="md:hidden">
             <AddResponderButton />
@@ -180,8 +173,6 @@ export default function RespondersPage() {
           </div>
         </div>
       </main>
-
-      <BottomNavigation initialActive="responders" />
     </section>
   );
 }

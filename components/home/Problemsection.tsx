@@ -34,7 +34,7 @@ export default function ProblemSection() {
           </h3>
           <p className="text-xl leading-relaxed text-slate-600">
             We all worry about our children, elderly parents, or partners when
-            we aren't together. Traditional tools can be slow or confusing
+            we aren&apos;t together. Traditional tools can be slow or confusing
             during a moment of panic.
           </p>
         </div>
@@ -43,7 +43,7 @@ export default function ProblemSection() {
           {problems.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="bg-warm-bg border-primary/5 hover:border-secondary/20 rounded-[2rem] border p-10 transition-colors duration-200"
+              className="bg-warm-bg border-primary/5 hover:border-secondary/20 rounded-4xl border p-10 transition-colors duration-200"
             >
               <div className="bg-secondary/10 text-secondary mb-8 flex h-16 w-16 items-center justify-center rounded-2xl">
                 <Icon className="h-8 w-8" />
