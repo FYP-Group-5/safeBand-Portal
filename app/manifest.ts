@@ -2,12 +2,14 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "SafeBand",
+    name: "SafeBand – Emergency Safety Network",
     short_name: "SafeBand",
+    description:
+      "Stay connected and protected. Instantly alert your trusted safety network with one tap.",
     start_url: "/dashboard",
     display: "standalone",
-    background_color: "#FFFFFF",
-    theme_color: "#FFFFFF",
+    background_color: "#2c5b4c",
+    theme_color: "#2c5b4c",
     orientation: "portrait",
     icons: [
       {

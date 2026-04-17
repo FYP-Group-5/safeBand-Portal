@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Heart, MapPin, AlertTriangle } from "lucide-react";
 
 export default function HeroSection() {
@@ -33,10 +34,14 @@ export default function HeroSection() {
         {/* Right — Illustration */}
         <div className="relative">
           <div className="soft-shadow relative rounded-[3rem] bg-white p-6">
-            <img
+            <Image
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrfMB87Phs-VLHn8_jxM9-9arjqae-barHhrNyfzckv1Hqmb74zKqKy1sJCKinnvhRZv7yEoR7a0_E4zwhLZ7ACU_Tif21aIVwpKEZPAJfaiESPPmNG_nrS9s9xqTi1nyMAYCUtp6TSmXnWkkHv2ASSoZNPYtXD5iEY4VDy6cEMcK-dueqeOynhqgwJkqut0pUnb6Q8DJXqC-XaL0vo-q-8NofXf_FRryb1Qj4KNeyN68sVD881Op9Gqk6bx2UZcnfVZfFUZZzwQ"
               alt="Family Connection illustration"
+              width={900}
+              height={600}
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="h-auto w-full rounded-[2.5rem] object-cover"
+              priority
             />
             {/* Location badge */}
             <div className="bg-secondary soft-shadow absolute -bottom-8 -left-8 max-w-50 rounded-3xl p-6 text-white">

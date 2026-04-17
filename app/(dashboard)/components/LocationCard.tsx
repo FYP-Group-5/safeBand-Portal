@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { MapPin } from "lucide-react";
 
 interface LocationCardProps {
@@ -30,11 +31,13 @@ export default function LocationCard({
             </span>
           </div>
         </div>
-        <div className="h-16 w-16 overflow-hidden rounded-lg border border-gray-200">
-          <img
-            className="h-full w-full object-cover"
+        <div className="relative h-16 w-16 overflow-hidden rounded-lg border border-gray-200">
+          <Image
+            fill
+            className="object-cover"
             alt="Satellite view of current user location"
             src={mapImageUrl}
+            sizes="64px"
           />
         </div>
       </div>
