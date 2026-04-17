@@ -8,23 +8,23 @@ const benefits = [
 
 export default function SolutionSection() {
   return (
-    <section className="py-24 bg-[#f2f9f6]" id="solution">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+    <section className="bg-[#f2f9f6] py-24" id="solution">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-20 px-6 lg:grid-cols-2">
         {/* Image */}
         <div className="relative order-2 lg:order-1">
-          <div className="bg-white p-4 rounded-[3rem] soft-shadow border-8 border-white">
+          <div className="soft-shadow rounded-[3rem] border-8 border-white bg-white p-4">
             <img
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTjLxHbO3RSGWeTTyieEMp2y6NNXjltIE5DIPNNFDYR6nA5mlHYDNUj2Jso7M_IWBCL0W4gPkCX3ZySzdPIVFtHOQMU_UoHHFM54CM5srwl93PQT8wZ2JfL6Y1gL7tQoALOH-oYeyRgtnsWJRPQtNxqlJVk4Kwpv8VQD8BWqaFlT7NY__AIMT72JwvQOit1rzWjilCSBeNAGnM-ilcy3ZmKm1ujjGWReeU_BMhHdnRGrHbFkEdawcoloJdsf2ruglSL0wy8VgUlg"
               alt="SafeBand App UI"
-              className="w-full h-auto rounded-[2rem]"
+              className="h-auto w-full rounded-4xl"
             />
           </div>
 
           {/* Floating notification */}
-          <div className="absolute top-1/2 -right-8 transform -translate-y-1/2 hidden lg:flex flex-col gap-4">
-            <div className="bg-white p-4 rounded-2xl shadow-lg border border-primary/5 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                <CheckCircle className="w-5 h-5" />
+          <div className="absolute top-1/2 -right-8 hidden -translate-y-1/2 transform flex-col gap-4 lg:flex">
+            <div className="border-primary/5 flex items-center gap-3 rounded-2xl border bg-white p-4 shadow-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600">
+                <CheckCircle className="h-5 w-5" />
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-900">Dad notified</p>
@@ -35,27 +35,27 @@ export default function SolutionSection() {
         </div>
 
         {/* Copy */}
-        <div className="flex flex-col gap-8 order-1 lg:order-2">
-          <h2 className="text-secondary text-sm font-bold uppercase tracking-[0.2em]">
+        <div className="order-1 flex flex-col gap-8 lg:order-2">
+          <h2 className="text-secondary text-sm font-bold tracking-[0.2em] uppercase">
             Our Solution
           </h2>
-          <h3 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight font-display">
+          <h3 className="font-display text-4xl leading-tight font-bold text-slate-900 md:text-5xl">
             Technology that feels like a hug.
           </h3>
-          <p className="text-lg text-slate-700 leading-relaxed">
-            SafeBand isn't just an alert system; it's a bridge between you and
-            your family. We've built a high-performance Progressive Web App
-            that's accessible from any device, instantly, without needing a
-            heavy install.
+          <p className="text-lg leading-relaxed text-slate-700">
+            SafeBand isn&apos;t just an alert system; it&apos;s a bridge between
+            you and your family. We&apos;ve built a high-performance Progressive
+            Web App that&apos;s accessible from any device, instantly, without
+            needing a heavy install.
           </p>
 
           <div className="space-y-6">
             {benefits.map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-secondary shadow-sm flex-shrink-0">
-                  <Icon className="w-5 h-5" />
+                <div className="text-secondary flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
+                  <Icon className="h-5 w-5" />
                 </div>
-                <p className="text-slate-600 font-medium">{text}</p>
+                <p className="font-medium text-slate-600">{text}</p>
               </div>
             ))}
           </div>
