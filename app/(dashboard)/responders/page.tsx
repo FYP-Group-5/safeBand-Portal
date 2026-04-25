@@ -45,7 +45,7 @@ export default function RespondersPage() {
   ];
 
   return (
-    <section className="bg-background-light relative flex min-h-screen w-full flex-col pb-20 md:pb-0">
+    <section className="bg-background-light relative flex min-h-screen w-full flex-col pb-20">
       {/* Top Navigation Bar */}
       <header className="border-primary-dark/10 flex items-center justify-between border-b bg-white px-6 py-4 md:px-10 lg:px-40">
         <div className="flex items-center gap-2">
