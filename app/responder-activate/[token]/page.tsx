@@ -1,0 +1,168 @@
+"use client";
+
+import { useState } from "react";
+import { Eye, EyeOff, Lock, CheckCircle, Info, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import Input from "@/components/ui/Input";
+import InviterCard from "@/components/responder/InviterCard";
+import ResponderActivateHeader from "../../../components/responder/ResponderActivateHeader";
+
+export default function ResponderActivatePage() {
+  const router = useRouter();
+  const params = useParams<{ token: string }>();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = params?.token;
+
+    if (typeof token === "string" && token.length > 0) {
+      router.push(`/responder-activate/${token}/activated`);
+    }
+  };
+
+  const isPasswordValid = formData.password.length >= 8 && /\d/.test(formData.password);
+  const passwordsMatch = formData.password === formData.confirmPassword && formData.password.length > 0;
+
+  return (
+    <div className="font-display bg-background-light text-primary-dark flex min-h-screen flex-col">
+      <ResponderActivateHeader mode="activation" />
+
+      {/* Main Content */}
+      <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md space-y-8">
+          {/* Heading */}
+          <div className="space-y-2 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-primary-dark">
+              You&apos;ve been added as an Emergency Responder
+            </h1>
+            <p className="text-slate-500">
+              Complete your profile to start receiving alerts.
+            </p>
+          </div>
+
+          {/* Inviter Card */}
+          <InviterCard
+            name="Sarah Johnson"
+            phoneNumber="(555) 0123-4567"
+            imageUrl="https://lh3.googleusercontent.com/aida-public/AB6AXuB5cfJ-63HsJ0FLwQy8UI2Ct76pCjH4HMch3xiAjle8O1Qtpti9HR-3GY5yGZW39JV8q2fKkHDfgurdNxIVwFkv6BEVxfWcI8C2cbT-Lt3byC1G6-Jmqr-g5uQuA95yIbDBC8CcT1jGIM3GLsRYxg_vwi0UB8l9WAW180_hoXSYomR2B3WNIbG3HX0Bf7HtGovrVN5qgr0vHM-4244SB0Bh39QVG04YnCJaRity1JPqM7geRvIAuzDJgIZzQaEDraOwfOa4LWJA-Q"
+          />
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+            <div className="space-y-6 p-8">
+              {/* Password Fields */}
+              <div className="space-y-4">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  label="Create Password"
+                  icon={Lock}
+                  placeholder="Enter 8+ characters"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  rightElement={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-slate-400 transition-colors hover:text-slate-600"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  }
+                />
+
+                <Input
+                  id="confirm-password"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  label="Confirm Password"
+                  icon={CheckCircle}
+                  placeholder="Repeat your password"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  rightElement={
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="text-slate-400 transition-colors hover:text-slate-600"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  }
+                />
+
+                {/* Password Requirement Info */}
+                <div className="flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3">
+                  <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+                  <p className="text-xs leading-relaxed text-blue-700">
+                    Password must be at least 8 characters long and include at
+                    least one number for your security.
+                  </p>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={!isPasswordValid || !passwordsMatch}
+                className="group flex w-full items-center justify-center gap-2 rounded-lg bg-primary-dark py-4 font-bold text-white shadow-lg shadow-primary-dark/20 transition-all hover:bg-primary-dark/90 disabled:bg-slate-300 disabled:shadow-none disabled:cursor-not-allowed"
+              >
+                Activate Account
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </button>
+            </div>
+          </form>
+
+          {/* Footer Links */}
+          <div className="flex flex-col items-center gap-4 text-sm text-slate-500">
+            <p>
+              Not you?{" "}
+              <Link href="#" className="font-semibold text-primary-dark hover:underline">
+                Contact Support
+              </Link>
+            </p>
+            <div className="flex items-center gap-4">
+              <Link href="#" className="transition-colors hover:text-slate-800">
+                Terms of Service
+              </Link>
+              <span className="size-1 rounded-full bg-slate-300" />
+              <Link href="#" className="transition-colors hover:text-slate-800">
+                Privacy Policy
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 py-8 text-center text-xs text-slate-400">
+        © 2024 SafeBand Technologies. All rights reserved. Your data is
+        encrypted and secure.
+      </footer>
+    </div>
+  );
+}
