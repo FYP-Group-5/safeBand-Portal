@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import {
   Shield,
@@ -10,13 +10,28 @@ import {
   EyeOff,
   LogIn,
   ShieldCheck,
+  AlertCircle,
 } from "lucide-react";
 import Input from "@/components/ui/Input";
+import { login } from "../actions/auth";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    startTransition(async () => {
+      const result = await login({ email, password });
+      if (result?.success === false) {
+        setError(result.error);
+      }
+    });
+  };
 
   return (
     <section className="bg-background-light flex min-h-screen items-center justify-center font-sans">
@@ -46,7 +61,7 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <Input
                 id="email"
                 name="email"
@@ -95,12 +110,21 @@ export default function LoginPage() {
                 required
               />
 
+              {/* Backend error */}
+              {error && (
+                <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
               <button
-                className="bg-primary-dark hover:bg-primary-dark/90 flex w-full transform items-center justify-center gap-2 rounded-lg py-3.5 font-bold text-white shadow-md transition-all hover:shadow-lg active:scale-[0.98]"
+                className="bg-primary-dark hover:bg-primary-dark/90 flex w-full transform items-center justify-center gap-2 rounded-lg py-3.5 font-bold text-white shadow-md transition-all hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
                 type="submit"
+                disabled={isPending}
               >
-                <span>Login</span>
-                <LogIn className="h-5 w-5" />
+                <span>{isPending ? "Logging in…" : "Login"}</span>
+                {!isPending && <LogIn className="h-5 w-5" />}
               </button>
             </form>
 

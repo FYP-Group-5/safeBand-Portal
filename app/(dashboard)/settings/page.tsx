@@ -12,6 +12,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
+import Form from "next/form";
+import { logout } from "@/app/actions/auth";
 
 export default function SettingsPage() {
   const settingsSections = [
@@ -138,10 +140,12 @@ export default function SettingsPage() {
           ))}
 
           {/* Logout Button */}
-          <button className="mt-4 flex items-center justify-center gap-2 rounded-xl border-2 border-rose-200 bg-rose-50 px-6 py-4 font-bold text-rose-600 transition-colors hover:bg-rose-100">
-            <LogOut className="h-5 w-5" />
-            <span>Log Out</span>
-          </button>
+          <Form action={logout} className="w-full">
+            <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-rose-200 bg-rose-50 px-6 py-4 font-bold text-rose-600 transition-colors hover:bg-rose-100">
+              <LogOut className="h-5 w-5" />
+              <span>Log Out</span>
+            </button>
+          </Form>
 
           {/* App Version */}
           <div className="text-center text-xs text-slate-400">

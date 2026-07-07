@@ -12,6 +12,7 @@ import {
   Eye,
   LogOut,
 } from "lucide-react";
+import { logout } from "@/app/actions/auth";
 
 const MapView = dynamic(() => import("../../components/MapView"), {
   ssr: false,
@@ -115,6 +116,7 @@ export default function ResponderDashboardPage() {
           </div>
           <button
             type="button"
+            onClick={() => logout()}
             className="flex items-center rounded-lg px-2.5 py-1.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
             title="Log out"
           >

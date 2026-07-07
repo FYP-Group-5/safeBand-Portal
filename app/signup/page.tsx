@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import {
   Shield,
@@ -14,15 +14,19 @@ import {
   ShieldCheck,
   LockKeyhole,
   Info,
+  AlertCircle,
 } from "lucide-react";
 import Input from "@/components/ui/Input";
+import { register } from "../actions/auth";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const getPasswordStrength = (pass: string) => {
     if (pass.length === 0) return { width: "0%", label: "" };
@@ -32,6 +36,16 @@ export default function SignupPage() {
   };
 
   const passwordStrength = getPasswordStrength(password);
+
+  const handleSubmit = () => {
+    setError(null);
+    startTransition(async () => {
+      const result = await register({ name, email, phone, password });
+      if (result?.success === false) {
+        setError(result.error);
+      }
+    });
+  };
 
   return (
     <section className="bg-background-light flex min-h-screen flex-col font-sans">
@@ -89,8 +103,8 @@ export default function SignupPage() {
               }
               type="text"
               placeholder="Jane Doe"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               icon={User}
             />
 
@@ -174,13 +188,23 @@ export default function SignupPage() {
               }
             />
 
+            {/* Backend error */}
+            {error && (
+              <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
             {/* Sign Up Button */}
             <button
-              type="submit"
-              className="bg-primary-dark shadow-primary-dark/20 hover:bg-primary-dark/90 mt-4 flex w-full items-center justify-center gap-2 rounded-lg py-4 text-base font-bold text-white shadow-lg transition-all active:scale-[0.98]"
+              type="button"
+              onClick={handleSubmit}
+              disabled={isPending}
+              className="bg-primary-dark shadow-primary-dark/20 hover:bg-primary-dark/90 mt-4 flex w-full items-center justify-center gap-2 rounded-lg py-4 text-base font-bold text-white shadow-lg transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Create Account
-              <ArrowRight className="h-5 w-5" />
+              {isPending ? "Creating Account…" : "Create Account"}
+              {!isPending && <ArrowRight className="h-5 w-5" />}
             </button>
 
             {/* Login Link */}
