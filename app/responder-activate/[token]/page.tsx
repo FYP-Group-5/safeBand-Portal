@@ -1,12 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { Eye, EyeOff, Lock, CheckCircle, Info, ArrowRight } from "lucide-react";
+import { useState, useTransition } from "react";
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  CheckCircle,
+  Info,
+  ArrowRight,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import Input from "@/components/ui/Input";
 import InviterCard from "@/components/responder/InviterCard";
 import ResponderActivateHeader from "../../../components/responder/ResponderActivateHeader";
+import { activateResponder } from "@/app/actions/responder";
 
 export default function ResponderActivatePage() {
   const router = useRouter();
@@ -17,6 +27,8 @@ export default function ResponderActivatePage() {
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,15 +40,30 @@ export default function ResponderActivatePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const token = params?.token;
+    setError(null);
 
-    if (typeof token === "string" && token.length > 0) {
-      router.push(`/responder-activate/${token}/activated`);
-    }
+    const token = params?.token;
+    if (!token) return;
+
+    startTransition(async () => {
+      const result = await activateResponder({
+        code: token,
+        password: formData.password,
+      });
+
+      if (!result.success) {
+        setError(result.error);
+      } else {
+        router.push(`/responder-activate/${token}/activated`);
+      }
+    });
   };
 
-  const isPasswordValid = formData.password.length >= 8 && /\d/.test(formData.password);
-  const passwordsMatch = formData.password === formData.confirmPassword && formData.password.length > 0;
+  const isPasswordValid =
+    formData.password.length >= 8 && /\d/.test(formData.password);
+  const passwordsMatch =
+    formData.password === formData.confirmPassword &&
+    formData.password.length > 0;
 
   return (
     <div className="font-display bg-background-light text-primary-dark flex min-h-screen flex-col">
@@ -47,7 +74,7 @@ export default function ResponderActivatePage() {
         <div className="w-full max-w-md space-y-8">
           {/* Heading */}
           <div className="space-y-2 text-center">
-            <h1 className="text-3xl font-bold tracking-tight text-primary-dark">
+            <h1 className="text-primary-dark text-3xl font-bold tracking-tight">
               You&apos;ve been added as an Emergency Responder
             </h1>
             <p className="text-slate-500">
@@ -63,7 +90,10 @@ export default function ResponderActivatePage() {
           />
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+          <form
+            onSubmit={handleSubmit}
+            className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"
+          >
             <div className="space-y-6 p-8">
               {/* Password Fields */}
               <div className="space-y-4">
@@ -103,7 +133,9 @@ export default function ResponderActivatePage() {
                   rightElement={
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="text-slate-400 transition-colors hover:text-slate-600"
                     >
                       {showConfirmPassword ? (
@@ -125,14 +157,31 @@ export default function ResponderActivatePage() {
                 </div>
               </div>
 
+              {/* Backend error */}
+              {error && (
+                <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={!isPasswordValid || !passwordsMatch}
-                className="group flex w-full items-center justify-center gap-2 rounded-lg bg-primary-dark py-4 font-bold text-white shadow-lg shadow-primary-dark/20 transition-all hover:bg-primary-dark/90 disabled:bg-slate-300 disabled:shadow-none disabled:cursor-not-allowed"
+                disabled={!isPasswordValid || !passwordsMatch || isPending}
+                className="group bg-primary-dark shadow-primary-dark/20 hover:bg-primary-dark/90 flex w-full items-center justify-center gap-2 rounded-lg py-4 font-bold text-white shadow-lg transition-all disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
               >
-                Activate Account
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                {isPending ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Activating…
+                  </>
+                ) : (
+                  <>
+                    Activate Account
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </>
+                )}
               </button>
             </div>
           </form>
@@ -141,7 +190,10 @@ export default function ResponderActivatePage() {
           <div className="flex flex-col items-center gap-4 text-sm text-slate-500">
             <p>
               Not you?{" "}
-              <Link href="#" className="font-semibold text-primary-dark hover:underline">
+              <Link
+                href="#"
+                className="text-primary-dark font-semibold hover:underline"
+              >
                 Contact Support
               </Link>
             </p>
