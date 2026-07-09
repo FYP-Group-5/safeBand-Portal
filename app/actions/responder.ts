@@ -6,7 +6,6 @@ import type {
   InviteResponderRequest,
   InviteResponderSuccessResponse,
   ActivateResponderRequest,
-  ActivateResponderSuccessResponse,
 } from "@/types/responder";
 
 /**
@@ -24,21 +23,47 @@ export async function inviteResponder(
     return { success: false, error: "Session expired. Please log in again." };
   }
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invite`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${sessionToken}`,
-    },
-    body: JSON.stringify(data),
-  });
+  let response: Response;
 
-  if (!response.ok) {
-    const errorBody: ApiErrorResponse = await response.json();
-    return { success: false, error: errorBody.message };
+  try {
+    response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invite`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    return {
+      success: false,
+      error: "Unable to connect to server. Please try again.",
+    };
   }
 
-  const result: InviteResponderSuccessResponse = await response.json();
+  if (!response.ok) {
+    try {
+      const errorBody: ApiErrorResponse = await response.json();
+      return { success: false, error: errorBody.message };
+    } catch {
+      return {
+        success: false,
+        error: "An unexpected error occurred. Please try again.",
+      };
+    }
+  }
+
+  let result: InviteResponderSuccessResponse;
+
+  try {
+    result = await response.json();
+  } catch {
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+
   return { success: true, message: result.message };
 }
 
@@ -50,21 +75,44 @@ export async function inviteResponder(
 export async function activateResponder(
   data: ActivateResponderRequest,
 ): Promise<ActionError | { success: true }> {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/responder-activate`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    },
-  );
+  let response: Response;
 
-  if (!response.ok) {
-    const errorBody: ApiErrorResponse = await response.json();
-    return { success: false, error: errorBody.message };
+  try {
+    response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/responder-activate`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      },
+    );
+  } catch {
+    return {
+      success: false,
+      error: "Unable to connect to server. Please try again.",
+    };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _result: ActivateResponderSuccessResponse = await response.json();
+  if (!response.ok) {
+    try {
+      const errorBody: ApiErrorResponse = await response.json();
+      return { success: false, error: errorBody.message };
+    } catch {
+      return {
+        success: false,
+        error: "An unexpected error occurred. Please try again.",
+      };
+    }
+  }
+
+  try {
+    await response.json();
+  } catch {
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+
   return { success: true };
 }

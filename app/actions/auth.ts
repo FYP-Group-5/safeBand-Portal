@@ -7,24 +7,48 @@ import type {
   LoginRequest,
   ActionError,
   ApiErrorResponse,
-  RegisterSuccessResponse,
   LoginSuccessResponse,
   UserRole,
 } from "@/types/auth";
 
 export async function login(data: LoginRequest): Promise<ActionError | void> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  let response: Response;
 
-  if (!response.ok) {
-    const errorBody: ApiErrorResponse = await response.json();
-    return { success: false, error: errorBody.message };
+  try {
+    response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    return {
+      success: false,
+      error: "Unable to connect to server. Please try again.",
+    };
   }
 
-  const result: LoginSuccessResponse = await response.json();
+  if (!response.ok) {
+    try {
+      const errorBody: ApiErrorResponse = await response.json();
+      return { success: false, error: errorBody.message };
+    } catch {
+      return {
+        success: false,
+        error: "An unexpected error occurred. Please try again.",
+      };
+    }
+  }
+
+  let result: LoginSuccessResponse;
+
+  try {
+    result = await response.json();
+  } catch {
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
   const role: UserRole = result.user.role;
 
   const cookieOptions = {
@@ -63,19 +87,41 @@ export async function getSession() {
 export async function register(
   data: RegisterRequest,
 ): Promise<ActionError | void> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  let response: Response;
 
-  if (!response.ok) {
-    const errorBody: ApiErrorResponse = await response.json();
-    return { success: false, error: errorBody.message };
+  try {
+    response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  } catch {
+    return {
+      success: false,
+      error: "Unable to connect to server. Please try again.",
+    };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _result: RegisterSuccessResponse = await response.json();
+  if (!response.ok) {
+    try {
+      const errorBody: ApiErrorResponse = await response.json();
+      return { success: false, error: errorBody.message };
+    } catch {
+      return {
+        success: false,
+        error: "An unexpected error occurred. Please try again.",
+      };
+    }
+  }
+
+  try {
+    await response.json();
+  } catch {
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
 
   redirect("/login");
 }
