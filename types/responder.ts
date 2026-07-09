@@ -1,5 +1,3 @@
-// ─── Invite ────────────────────────────────────────────────────────────────
-
 export interface InviteResponderRequest {
   name: string;
   email: string;
@@ -23,8 +21,6 @@ export interface InviteResponderSuccessResponse {
   data: Responder;
 }
 
-// ─── Activation ────────────────────────────────────────────────────────────
-
 export interface ActivateResponderRequest {
   code: string;
   password: string;
@@ -33,4 +29,17 @@ export interface ActivateResponderRequest {
 export interface ActivateResponderSuccessResponse {
   success: true;
   message: string;
+  token: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    role: "responder";
+  };
+}
+
+export interface UserInfo {
+  id: number;
+  name: string;
+  email: string;
 }

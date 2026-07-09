@@ -1,18 +1,17 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import type { ActionError, ApiErrorResponse } from "@/types/auth";
 import type {
   InviteResponderRequest,
   InviteResponderSuccessResponse,
   ActivateResponderRequest,
+  ActivateResponderSuccessResponse,
+  UserInfo,
+  Responder,
 } from "@/types/responder";
 
-/**
- * Sends an invitation email to a new responder.
- * Requires an active session — the token is read from the httpOnly cookie
- * and forwarded as `Authorization: Bearer <token>`.
- */
 export async function inviteResponder(
   data: InviteResponderRequest,
 ): Promise<ActionError | { success: true; message: string }> {
@@ -67,14 +66,9 @@ export async function inviteResponder(
   return { success: true, message: result.message };
 }
 
-/**
- * Accepts a responder invite — submits the invite token (from the email link)
- * together with the responder's chosen password.
- * This is a public endpoint; no session cookie is required.
- */
 export async function activateResponder(
   data: ActivateResponderRequest,
-): Promise<ActionError | { success: true }> {
+): Promise<ActionError | void> {
   let response: Response;
 
   try {
@@ -105,8 +99,10 @@ export async function activateResponder(
     }
   }
 
+  let result: ActivateResponderSuccessResponse;
+
   try {
-    await response.json();
+    result = await response.json();
   } catch {
     return {
       success: false,
@@ -114,5 +110,106 @@ export async function activateResponder(
     };
   }
 
-  return { success: true };
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+  };
+
+  const cookieStore = await cookies();
+  cookieStore.set("session_token", result.token, cookieOptions);
+  cookieStore.set("user_role", result.user.role, cookieOptions);
+
+  redirect("/responder/dashboard");
+}
+
+export async function getInviter(
+  userId: number,
+): Promise<ActionError | { success: true; data: UserInfo }> {
+  let response: Response;
+
+  try {
+    response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
+      { method: "GET" },
+    );
+  } catch {
+    return {
+      success: false,
+      error: "Unable to connect to server. Please try again.",
+    };
+  }
+
+  if (!response.ok) {
+    try {
+      const errorBody: ApiErrorResponse = await response.json();
+      return { success: false, error: errorBody.message };
+    } catch {
+      return {
+        success: false,
+        error: "An unexpected error occurred. Please try again.",
+      };
+    }
+  }
+
+  try {
+    const result = await response.json();
+    return { success: true, data: result.data };
+  } catch {
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+export async function getResponders(): Promise<
+  ActionError | { success: true; data: Responder[] }
+> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("session_token")?.value;
+
+  if (!sessionToken) {
+    return { success: false, error: "Session expired. Please log in again." };
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/responders`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    });
+  } catch {
+    return {
+      success: false,
+      error: "Unable to connect to server. Please try again.",
+    };
+  }
+
+  if (!response.ok) {
+    try {
+      const errorBody: ApiErrorResponse = await response.json();
+      return { success: false, error: errorBody.message };
+    } catch {
+      return {
+        success: false,
+        error: "An unexpected error occurred. Please try again.",
+      };
+    }
+  }
+
+  try {
+    const result = await response.json();
+    return { success: true, data: result.data };
+  } catch {
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
 }

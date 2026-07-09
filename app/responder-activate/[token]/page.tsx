@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import {
   Eye,
   EyeOff,
@@ -12,15 +12,16 @@ import {
   Loader2,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Input from "@/components/ui/Input";
 import InviterCard from "@/components/responder/InviterCard";
 import ResponderActivateHeader from "../../../components/responder/ResponderActivateHeader";
-import { activateResponder } from "@/app/actions/responder";
+import { activateResponder, getInviter } from "@/app/actions/responder";
+import type { UserInfo } from "@/types/responder";
 
 export default function ResponderActivatePage() {
-  const router = useRouter();
   const params = useParams<{ token: string }>();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -29,6 +30,18 @@ export default function ResponderActivatePage() {
   });
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [inviter, setInviter] = useState<UserInfo | null>(null);
+
+  useEffect(() => {
+    const invitedBy = searchParams.get("invitedBy");
+    if (invitedBy) {
+      getInviter(Number(invitedBy)).then((result) => {
+        if (result.success) {
+          setInviter(result.data);
+        }
+      });
+    }
+  }, [searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,10 +64,8 @@ export default function ResponderActivatePage() {
         password: formData.password,
       });
 
-      if (!result.success) {
+      if (result) {
         setError(result.error);
-      } else {
-        router.push(`/responder-activate/${token}/activated`);
       }
     });
   };
@@ -69,10 +80,8 @@ export default function ResponderActivatePage() {
     <div className="font-display bg-background-light text-primary-dark flex min-h-screen flex-col">
       <ResponderActivateHeader mode="activation" />
 
-      {/* Main Content */}
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-md space-y-8">
-          {/* Heading */}
           <div className="space-y-2 text-center">
             <h1 className="text-primary-dark text-3xl font-bold tracking-tight">
               You&apos;ve been added as an Emergency Responder
@@ -82,20 +91,18 @@ export default function ResponderActivatePage() {
             </p>
           </div>
 
-          {/* Inviter Card */}
-          <InviterCard
-            name="Sarah Johnson"
-            phoneNumber="(555) 0123-4567"
-            imageUrl="https://lh3.googleusercontent.com/aida-public/AB6AXuB5cfJ-63HsJ0FLwQy8UI2Ct76pCjH4HMch3xiAjle8O1Qtpti9HR-3GY5yGZW39JV8q2fKkHDfgurdNxIVwFkv6BEVxfWcI8C2cbT-Lt3byC1G6-Jmqr-g5uQuA95yIbDBC8CcT1jGIM3GLsRYxg_vwi0UB8l9WAW180_hoXSYomR2B3WNIbG3HX0Bf7HtGovrVN5qgr0vHM-4244SB0Bh39QVG04YnCJaRity1JPqM7geRvIAuzDJgIZzQaEDraOwfOa4LWJA-Q"
-          />
+          {inviter && (
+            <InviterCard
+              name={inviter.name}
+              email={inviter.email}
+            />
+          )}
 
-          {/* Form */}
           <form
             onSubmit={handleSubmit}
             className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"
           >
             <div className="space-y-6 p-8">
-              {/* Password Fields */}
               <div className="space-y-4">
                 <Input
                   id="password"
@@ -147,7 +154,6 @@ export default function ResponderActivatePage() {
                   }
                 />
 
-                {/* Password Requirement Info */}
                 <div className="flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3">
                   <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
                   <p className="text-xs leading-relaxed text-blue-700">
@@ -157,7 +163,6 @@ export default function ResponderActivatePage() {
                 </div>
               </div>
 
-              {/* Backend error */}
               {error && (
                 <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -165,7 +170,6 @@ export default function ResponderActivatePage() {
                 </div>
               )}
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={!isPasswordValid || !passwordsMatch || isPending}
@@ -186,7 +190,6 @@ export default function ResponderActivatePage() {
             </div>
           </form>
 
-          {/* Footer Links */}
           <div className="flex flex-col items-center gap-4 text-sm text-slate-500">
             <p>
               Not you?{" "}
@@ -210,7 +213,6 @@ export default function ResponderActivatePage() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-slate-200 py-8 text-center text-xs text-slate-400">
         © 2024 SafeBand Technologies. All rights reserved. Your data is
         encrypted and secure.
