@@ -6,7 +6,6 @@ import {
   EyeOff,
   Lock,
   CheckCircle,
-  Info,
   ArrowRight,
   AlertCircle,
   Loader2,
@@ -70,8 +69,18 @@ export default function ResponderActivatePage() {
     });
   };
 
-  const isPasswordValid =
-    formData.password.length >= 8 && /\d/.test(formData.password);
+  const getPasswordErrors = (pass: string) => {
+    const errors: string[] = [];
+    if (pass.length < 8 || pass.length > 24) errors.push("8–24 characters");
+    if (!/[A-Z]/.test(pass)) errors.push("1 uppercase letter");
+    if (!/[a-z]/.test(pass)) errors.push("1 lowercase letter");
+    if (!/\d/.test(pass)) errors.push("1 number");
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pass))
+      errors.push("1 special character");
+    return errors;
+  };
+  const passwordErrors = getPasswordErrors(formData.password);
+  const isPasswordValid = passwordErrors.length === 0;
   const passwordsMatch =
     formData.password === formData.confirmPassword &&
     formData.password.length > 0;
@@ -154,12 +163,29 @@ export default function ResponderActivatePage() {
                   }
                 />
 
-                <div className="flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3">
-                  <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
-                  <p className="text-xs leading-relaxed text-blue-700">
-                    Password must be at least 8 characters long and include at
-                    least one number for your security.
-                  </p>
+                <div className="space-y-1.5">
+                  {[
+                    { key: "8–24 characters", test: formData.password.length >= 8 && formData.password.length <= 24 },
+                    { key: "1 uppercase letter", test: /[A-Z]/.test(formData.password) },
+                    { key: "1 lowercase letter", test: /[a-z]/.test(formData.password) },
+                    { key: "1 number", test: /\d/.test(formData.password) },
+                    { key: "1 special character", test: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(formData.password) },
+                  ].map((rule) => (
+                    <div key={rule.key} className="flex items-center gap-2 text-xs">
+                      <div
+                        className={`size-1.5 rounded-full ${
+                          rule.test ? "bg-green-500" : "bg-slate-300"
+                        }`}
+                      />
+                      <span
+                        className={
+                          rule.test ? "text-green-700" : "text-slate-500"
+                        }
+                      >
+                        {rule.key}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
 

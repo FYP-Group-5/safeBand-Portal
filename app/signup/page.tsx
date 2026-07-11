@@ -28,11 +28,27 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const getPasswordErrors = (pass: string) => {
+    const errors: string[] = [];
+    if (pass.length < 8 || pass.length > 24) errors.push("8–24 characters");
+    if (!/[A-Z]/.test(pass)) errors.push("1 uppercase letter");
+    if (!/[a-z]/.test(pass)) errors.push("1 lowercase letter");
+    if (!/\d/.test(pass)) errors.push("1 number");
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(pass))
+      errors.push("1 special character");
+    return errors;
+  };
+  const passwordErrors = getPasswordErrors(password);
+  const isPasswordValid = passwordErrors.length === 0;
+
   const getPasswordStrength = (pass: string) => {
     if (pass.length === 0) return { width: "0%", label: "" };
-    if (pass.length < 6) return { width: "33%", label: "Weak" };
-    if (pass.length < 10) return { width: "66%", label: "Strong" };
-    return { width: "100%", label: "Very Strong" };
+    const passed = passwordErrors.length;
+    const total = 5;
+    const pct = ((total - passed) / total) * 100;
+    if (isPasswordValid) return { width: "100%", label: "Strong" };
+    if (pct >= 60) return { width: "66%", label: "Fair" };
+    return { width: "33%", label: "Weak" };
   };
 
   const passwordStrength = getPasswordStrength(password);
@@ -173,16 +189,42 @@ export default function SignupPage() {
               }
               helperText={
                 password ? (
-                  <div className="flex items-center gap-2">
-                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-slate-200">
-                      <div
-                        className="bg-primary-dark h-full rounded-full transition-all duration-300"
-                        style={{ width: passwordStrength.width }}
-                      />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1 flex-1 overflow-hidden rounded-full bg-slate-200">
+                        <div
+                          className="bg-primary-dark h-full rounded-full transition-all duration-300"
+                          style={{ width: passwordStrength.width }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-medium text-slate-500">
+                        {passwordStrength.label}
+                      </span>
                     </div>
-                    <span className="text-[10px] font-medium text-slate-500">
-                      {passwordStrength.label}
-                    </span>
+                    <div className="space-y-1">
+                      {[
+                        { key: "8–24 characters", test: password.length >= 8 && password.length <= 24 },
+                        { key: "1 uppercase letter", test: /[A-Z]/.test(password) },
+                        { key: "1 lowercase letter", test: /[a-z]/.test(password) },
+                        { key: "1 number", test: /\d/.test(password) },
+                        { key: "1 special character", test: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password) },
+                      ].map((rule) => (
+                        <div key={rule.key} className="flex items-center gap-2 text-xs">
+                          <div
+                            className={`size-1.5 rounded-full ${
+                              rule.test ? "bg-green-500" : "bg-slate-300"
+                            }`}
+                          />
+                          <span
+                            className={
+                              rule.test ? "text-green-700" : "text-slate-500"
+                            }
+                          >
+                            {rule.key}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : null
               }

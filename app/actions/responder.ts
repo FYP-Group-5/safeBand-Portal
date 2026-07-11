@@ -165,6 +165,116 @@ export async function getInviter(
   }
 }
 
+export async function updateResponder(
+  id: number,
+  data: InviteResponderRequest,
+): Promise<ActionError | { success: true; message: string }> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("session_token")?.value;
+
+  if (!sessionToken) {
+    return { success: false, error: "Session expired. Please log in again." };
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/contacts/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify(data),
+      },
+    );
+  } catch {
+    return {
+      success: false,
+      error: "Unable to connect to server. Please try again.",
+    };
+  }
+
+  if (!response.ok) {
+    try {
+      const errorBody: ApiErrorResponse = await response.json();
+      return { success: false, error: errorBody.message };
+    } catch {
+      return {
+        success: false,
+        error: "An unexpected error occurred. Please try again.",
+      };
+    }
+  }
+
+  let result: InviteResponderSuccessResponse;
+
+  try {
+    result = await response.json();
+  } catch {
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+
+  return { success: true, message: result.message };
+}
+
+export async function deleteResponder(
+  id: number,
+): Promise<ActionError | { success: true; message: string }> {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get("session_token")?.value;
+
+  if (!sessionToken) {
+    return { success: false, error: "Session expired. Please log in again." };
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/contacts/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      },
+    );
+  } catch {
+    return {
+      success: false,
+      error: "Unable to connect to server. Please try again.",
+    };
+  }
+
+  if (!response.ok) {
+    try {
+      const errorBody: ApiErrorResponse = await response.json();
+      return { success: false, error: errorBody.message };
+    } catch {
+      return {
+        success: false,
+        error: "An unexpected error occurred. Please try again.",
+      };
+    }
+  }
+
+  try {
+    const result = await response.json();
+    return { success: true, message: result.message };
+  } catch {
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
 export async function getResponders(): Promise<
   ActionError | { success: true; data: Responder[] }
 > {
