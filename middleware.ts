@@ -101,6 +101,6 @@ export const config = {
      *   sw.js / workbox-* / serwist-* – PWA service-worker artefacts
      *   Static asset extensions – images, fonts, icons
      */
-    "/((?!_next/static|_next/image|_next/webpack-hmr|sw\\.js|workbox-.*|serwist-.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?)$).*)",
+    "/((?!_next/static|_next/image|_next/webpack-hmr|sw\\.js|workbox-.*|serwist.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?)$).*)",
   ],
 };

@@ -36,9 +36,7 @@ function responderContact(responder: Responder): {
 
 function Skeleton({ className }: { className?: string }) {
   return (
-    <div
-      className={`animate-pulse rounded bg-slate-200 ${className ?? ""}`}
-    />
+    <div className={`animate-pulse rounded bg-slate-200 ${className ?? ""}`} />
   );
 }
 
@@ -118,10 +116,7 @@ function EditResponderModal({
   return (
     <div className="bg-primary-dark/40 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
       <div className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col overflow-hidden"
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col overflow-hidden">
           <div className="flex items-start justify-between px-8 pt-8 pb-4">
             <div>
               <h2 className="text-primary-dark text-2xl font-bold tracking-tight">
