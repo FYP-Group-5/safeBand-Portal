@@ -10,6 +10,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { EmergencyProvider } from "@/lib/emergency-context";
+import ToastContainer from "@/components/ui/ToastContainer";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -26,6 +27,7 @@ export default function AdminLayout({
 
   return (
     <EmergencyProvider role="admin">
+      <ToastContainer />
     <div className="flex min-h-screen bg-[#f6f7f8]">
       {/* Sidebar */}
       <aside className="fixed flex h-full w-64 flex-col bg-[#0b203c] text-white">

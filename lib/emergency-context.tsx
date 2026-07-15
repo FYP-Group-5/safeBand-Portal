@@ -13,11 +13,13 @@ import { connectSocket, joinRoom, disconnectSocket, getSocket } from "./socket";
 import * as sosActions from "@/app/actions/sos";
 import type { Alert, LocationPoint } from "@/types/sos";
 import type { ActionError } from "@/types/auth";
+import { showBrowserNotification, createToast, type Toast } from "./notify";
 
 interface EmergencyState {
   alerts: Alert[];
   activeAlert: Alert | null;
   locations: Map<string, LocationPoint[]>;
+  toasts: Toast[];
   isTriggering: boolean;
   isStreaming: boolean;
   error: string | null;
@@ -31,6 +33,7 @@ interface EmergencyContextValue extends EmergencyState {
   startGpsStreaming: (alertId: string) => void;
   stopGpsStreaming: () => void;
   clearError: () => void;
+  dismissToast: (id: string) => void;
 }
 
 const EmergencyContext = createContext<EmergencyContextValue | null>(null);
@@ -45,6 +48,7 @@ export function EmergencyProvider({ children, role }: Props) {
     alerts: [],
     activeAlert: null,
     locations: new Map(),
+    toasts: [],
     isTriggering: false,
     isStreaming: false,
     error: null,
@@ -60,6 +64,19 @@ export function EmergencyProvider({ children, role }: Props) {
   const setError = useCallback((msg: string) => {
     setState((s) => ({ ...s, isTriggering: false, error: msg }));
   }, []);
+
+  const dismissToast = useCallback((id: string) => {
+    setState((s) => ({ ...s, toasts: s.toasts.filter((t) => t.id !== id) }));
+  }, []);
+
+  const pushToast = useCallback(
+    (title: string, message: string, type: Toast["type"]) => {
+      showBrowserNotification(title, message);
+      const toast = createToast(title, message, type);
+      setState((s) => ({ ...s, toasts: [...s.toasts, toast] }));
+    },
+    [],
+  );
 
   // ─── GPS streaming ─────────────────────────────────────────────────────
   const startGpsStreaming = useCallback((alertId: string) => {
@@ -189,6 +206,11 @@ export function EmergencyProvider({ children, role }: Props) {
         if (s.alerts.some((a) => a.id === data.alert_id)) return s;
         return { ...s, alerts: [newAlert, ...s.alerts] };
       });
+      pushToast(
+        "🚨 New Emergency",
+        `${data.user_name} triggered an SOS alert`,
+        "emergency",
+      );
     };
 
     const onLocationUpdate = (data: any) => {
@@ -234,6 +256,11 @@ export function EmergencyProvider({ children, role }: Props) {
         activeAlertRef.current = null;
         stopGpsStreaming();
       }
+      pushToast(
+        "✅ Emergency Resolved",
+        `Alert ${data.alert_id.slice(0, 8)} has been resolved`,
+        "resolved",
+      );
     };
 
     socket.on("connect", onConnect);
@@ -343,6 +370,7 @@ export function EmergencyProvider({ children, role }: Props) {
         startGpsStreaming,
         stopGpsStreaming,
         clearError,
+        dismissToast,
       }}
     >
       {children}
