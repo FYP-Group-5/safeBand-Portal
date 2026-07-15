@@ -34,7 +34,6 @@ export default function PanicButton() {
               {isStreaming ? "Streaming Location" : "Location Paused"}
             </div>
           </div>
-          <div className="bg-emerald-500 absolute inset-0 animate-ping rounded-full opacity-20"></div>
         </div>
 
         <button
@@ -81,7 +80,6 @@ export default function PanicButton() {
             <div className="h-full w-1/3 bg-white"></div>
           </div>
         </button>
-        <div className="bg-emergency absolute inset-0 animate-ping rounded-full opacity-20"></div>
       </div>
       <p className="mt-8 flex items-center gap-2 text-sm font-medium tracking-wide text-gray-500">
         <Hand className="h-4 w-4" />
