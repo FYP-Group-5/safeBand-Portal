@@ -14,12 +14,22 @@ import * as sosActions from "@/app/actions/sos";
 import type { Alert, LocationPoint } from "@/types/sos";
 import type { ActionError } from "@/types/auth";
 import { showBrowserNotification, createToast, type Toast } from "./notify";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import {
+  enqueue,
+  dequeue,
+  getQueue,
+  getQueueLength,
+  replaceTempId,
+  type QueueAction,
+} from "./offline-queue";
 
 interface EmergencyState {
   alerts: Alert[];
   activeAlert: Alert | null;
   locations: Map<string, LocationPoint[]>;
   toasts: Toast[];
+  pendingCount: number;
   isTriggering: boolean;
   isStreaming: boolean;
   error: string | null;
@@ -49,6 +59,7 @@ export function EmergencyProvider({ children, role }: Props) {
     activeAlert: null,
     locations: new Map(),
     toasts: [],
+    pendingCount: 0,
     isTriggering: false,
     isStreaming: false,
     error: null,
@@ -56,6 +67,7 @@ export function EmergencyProvider({ children, role }: Props) {
 
   const watchIdRef = useRef<number | null>(null);
   const activeAlertRef = useRef<Alert | null>(null);
+  const { isOnline, isOnlineRef } = useOnlineStatus();
 
   const clearError = useCallback(() => {
     setState((s) => ({ ...s, error: null }));
@@ -78,49 +90,68 @@ export function EmergencyProvider({ children, role }: Props) {
     [],
   );
 
+  const refreshPendingCount = useCallback(() => {
+    setState((s) => ({ ...s, pendingCount: getQueueLength() }));
+  }, []);
+
   // ─── GPS streaming ─────────────────────────────────────────────────────
-  const startGpsStreaming = useCallback((alertId: string) => {
-    if (watchIdRef.current !== null) return;
+  const startGpsStreaming = useCallback(
+    (alertId: string) => {
+      if (watchIdRef.current !== null) return;
 
-    const nav = typeof navigator !== "undefined" ? (navigator as any) : null;
-    if (!nav?.geolocation) {
-      setError("Geolocation not supported.");
-      return;
-    }
-
-    setState((s) => ({ ...s, isStreaming: true }));
-
-    const sendPosition = (lat: number, lng: number) => {
-      const socket = getSocket();
-      if (socket?.connected) {
-        socket.emit("SOS_TRACKING", { alert_id: alertId, latitude: lat, longitude: lng });
-      } else {
-        sosActions.logLocation(alertId, lat, lng).then((res) => {
-          if (!("data" in res)) {
-            console.warn("[GPS] HTTP fallback failed:", (res as any).error);
-          }
-        });
+      const nav =
+        typeof navigator !== "undefined" ? (navigator as any) : null;
+      if (!nav?.geolocation) {
+        setError("Geolocation not supported.");
+        return;
       }
-    };
 
-    const success = (pos: any) => {
-      sendPosition(pos.coords.latitude, pos.coords.longitude);
-    };
+      setState((s) => ({ ...s, isStreaming: true }));
 
-    const error = (err: any) => {
-      console.warn("[GPS] watchPosition error:", err.message);
-    };
+      const sendPosition = (lat: number, lng: number) => {
+        const socket = getSocket();
+        if (socket?.connected) {
+          socket.emit("SOS_TRACKING", {
+            alert_id: alertId,
+            latitude: lat,
+            longitude: lng,
+          });
+        } else if (isOnlineRef.current) {
+          sosActions.logLocation(alertId, lat, lng).then((res) => {
+            if (!("data" in res)) {
+              console.warn("[GPS] HTTP fallback failed:", (res as any).error);
+            }
+          });
+        } else {
+          enqueue({
+            type: "log_location",
+            payload: { alert_id: alertId, latitude: lat, longitude: lng },
+          });
+          refreshPendingCount();
+        }
+      };
 
-    watchIdRef.current = nav.geolocation.watchPosition(success, error, {
-      enableHighAccuracy: true,
-      maximumAge: 5000,
-      timeout: 10000,
-    });
-  }, [setError]);
+      const success = (pos: any) => {
+        sendPosition(pos.coords.latitude, pos.coords.longitude);
+      };
+
+      const err = (err: any) => {
+        console.warn("[GPS] watchPosition error:", err.message);
+      };
+
+      watchIdRef.current = nav.geolocation.watchPosition(success, err, {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 10000,
+      });
+    },
+    [setError, refreshPendingCount],
+  );
 
   const stopGpsStreaming = useCallback(() => {
     if (watchIdRef.current !== null) {
-      const nav = typeof navigator !== "undefined" ? (navigator as any) : null;
+      const nav =
+        typeof navigator !== "undefined" ? (navigator as any) : null;
       if (nav?.geolocation) {
         nav.geolocation.clearWatch(watchIdRef.current);
       }
@@ -135,12 +166,35 @@ export function EmergencyProvider({ children, role }: Props) {
 
     let ls: any = null;
     try {
-      ls = (typeof globalThis !== "undefined" ? (globalThis as any).localStorage : null);
+      ls =
+        typeof globalThis !== "undefined"
+          ? (globalThis as any).localStorage
+          : null;
     } catch {
       // server-side — ignore
     }
     const storedId = ls?.getItem("sos_active_alert_id");
     if (!storedId) return;
+
+    // Check if it's a temp offline ID
+    const queue = getQueue();
+    const hasPendingTrigger = queue.some(
+      (a) => a.type === "trigger_sos" && a.tempAlertId === storedId,
+    );
+    if (hasPendingTrigger) {
+      // Restore from local state — alert hasn't been sent yet
+      const pendingAlert: Alert = {
+        id: storedId,
+        user_id: "",
+        status: "active",
+        created_at: new Date().toISOString(),
+        ended_at: null,
+      };
+      setState((s) => ({ ...s, activeAlert: pendingAlert }));
+      activeAlertRef.current = pendingAlert;
+      startGpsStreaming(storedId);
+      return;
+    }
 
     sosActions.getActiveAlerts().then((res) => {
       if ("error" in res) return;
@@ -278,11 +332,155 @@ export function EmergencyProvider({ children, role }: Props) {
       socket.off("UPDATE_MAP", onUpdateMap);
       socket.off("EMERGENCY_RESOLVED", onEmergencyResolved);
     };
-  }, [role, stopGpsStreaming]);
+  }, [role, stopGpsStreaming, pushToast]);
+
+  // ─── Flush offline queue when transitioning online ───────────────────────
+  useEffect(() => {
+    if (!isOnline) return;
+
+    const items = getQueue();
+    if (items.length === 0) return;
+
+    let changed = false;
+
+    (async () => {
+      for (const item of items) {
+        try {
+          if (item.type === "trigger_sos") {
+            const res = await sosActions.triggerSos();
+            if ("error" in res) {
+              // non-retriable or still offline — skip
+              if (res.error.includes("connect") || res.error.includes("network")) {
+                continue;
+              }
+              dequeue(item.id);
+              changed = true;
+              continue;
+            }
+
+            // Replace temp ID with real ID in queue
+            if (item.tempAlertId) {
+              replaceTempId(item.tempAlertId, res.alert.id);
+              // Update localStorage
+              try {
+                const ls =
+                  typeof globalThis !== "undefined"
+                    ? (globalThis as any).localStorage
+                    : null;
+                if (ls?.getItem("sos_active_alert_id") === item.tempAlertId) {
+                  ls.setItem("sos_active_alert_id", res.alert.id);
+                }
+              } catch {
+                // non-critical
+              }
+              // Update activeAlert in state
+              setState((s) => {
+                if (s.activeAlert?.id === item.tempAlertId) {
+                  return { ...s, activeAlert: res.alert };
+                }
+                return s;
+              });
+              activeAlertRef.current = res.alert;
+            }
+
+            dequeue(item.id);
+            changed = true;
+          }
+
+          if (item.type === "log_location") {
+            const { alert_id, latitude, longitude } = item.payload as any;
+            const res = await sosActions.logLocation(alert_id, latitude, longitude);
+            if ("error" in res) {
+              if (res.error.includes("connect") || res.error.includes("network")) {
+                continue;
+              }
+              dequeue(item.id);
+              changed = true;
+              continue;
+            }
+            dequeue(item.id);
+            changed = true;
+          }
+
+          if (item.type === "resolve_alert") {
+            const { alertId } = item.payload as any;
+            const res = await sosActions.resolveAlert(alertId);
+            if ("error" in res) {
+              if (res.error.includes("connect") || res.error.includes("network")) {
+                continue;
+              }
+              dequeue(item.id);
+              changed = true;
+              continue;
+            }
+            dequeue(item.id);
+            changed = true;
+          }
+        } catch {
+          continue;
+        }
+      }
+
+      if (changed) {
+        refreshPendingCount();
+        pushToast(
+          "Synced",
+          "Offline alerts have been sent to the server.",
+          "info",
+        );
+      }
+    })();
+  }, [isOnline, refreshPendingCount, pushToast]);
+
+  // ─── Read pending count on mount ────────────────────────────────────────
+  useEffect(() => {
+    refreshPendingCount();
+  }, [refreshPendingCount]);
 
   // ─── triggerSos ─────────────────────────────────────────────────────────
-  const triggerSos = useCallback(async () => {
+  const triggerSos = useCallback(async (): Promise<
+    ActionError | { success: true; alert: Alert }
+  > => {
     setState((s) => ({ ...s, isTriggering: true, error: null }));
+
+    if (!isOnlineRef.current) {
+      // Offline — save locally
+      const tempId = crypto.randomUUID();
+      const tempAlert: Alert = {
+        id: tempId,
+        user_id: "",
+        status: "active",
+        created_at: new Date().toISOString(),
+        ended_at: null,
+      };
+
+      enqueue({
+        type: "trigger_sos",
+        payload: {},
+        tempAlertId: tempId,
+      });
+
+      setState((s) => ({
+        ...s,
+        isTriggering: false,
+        activeAlert: tempAlert,
+        pendingCount: getQueueLength(),
+      }));
+      activeAlertRef.current = tempAlert;
+
+      try {
+        const ls =
+          typeof globalThis !== "undefined"
+            ? (globalThis as any).localStorage
+            : null;
+        ls?.setItem("sos_active_alert_id", tempId);
+      } catch {
+        // non-critical
+      }
+
+      return { success: true as const, alert: tempAlert };
+    }
+
     const res = await sosActions.triggerSos();
     if ("error" in res) {
       setState((s) => ({ ...s, isTriggering: false, error: res.error }));
@@ -291,24 +489,20 @@ export function EmergencyProvider({ children, role }: Props) {
     setState((s) => ({ ...s, isTriggering: false, activeAlert: res.alert }));
     activeAlertRef.current = res.alert;
 
-    // Persist to localStorage so it survives refresh
     try {
-      let ls: any = null;
-      try {
-        ls = typeof globalThis !== "undefined" ? (globalThis as any).localStorage : null;
-      } catch {
-        // server-side — ignore
-      }
+      const ls =
+        typeof globalThis !== "undefined"
+          ? (globalThis as any).localStorage
+          : null;
       ls?.setItem("sos_active_alert_id", res.alert.id);
     } catch {
       // non-critical
     }
 
-    // Connect socket for GPS streaming
     try {
       connectSocket();
     } catch {
-      // non-critical — GPS will fall back to HTTP
+      // non-critical
     }
 
     return res;
@@ -316,7 +510,39 @@ export function EmergencyProvider({ children, role }: Props) {
 
   // ─── resolveAlert ───────────────────────────────────────────────────────
   const resolveAlert = useCallback(
-    async (alertId: string) => {
+    async (
+      alertId: string,
+    ): Promise<
+      ActionError | { success: true; message: string; alert: Alert }
+    > => {
+      if (!isOnlineRef.current) {
+        enqueue({
+          type: "resolve_alert",
+          payload: { alertId },
+        });
+        setState((s) => ({
+          ...s,
+          activeAlert:
+            s.activeAlert?.id === alertId ? null : s.activeAlert,
+          alerts: s.alerts.filter((a) => a.id !== alertId),
+          pendingCount: getQueueLength(),
+        }));
+        if (activeAlertRef.current?.id === alertId) {
+          activeAlertRef.current = null;
+          stopGpsStreaming();
+          try {
+            const ls =
+              typeof globalThis !== "undefined"
+                ? (globalThis as any).localStorage
+                : null;
+            ls?.removeItem("sos_active_alert_id");
+          } catch {
+            // non-critical
+          }
+        }
+        return { success: true as const, message: "Saved offline. Will resolve when connected.", alert: { id: alertId, user_id: "", status: "resolved" as const, created_at: "", ended_at: null } };
+      }
+
       const res = await sosActions.resolveAlert(alertId);
       if ("error" in res) {
         setError(res.error);
@@ -332,12 +558,10 @@ export function EmergencyProvider({ children, role }: Props) {
         activeAlertRef.current = null;
         stopGpsStreaming();
         try {
-          let ls: any = null;
-          try {
-            ls = typeof globalThis !== "undefined" ? (globalThis as any).localStorage : null;
-          } catch {
-            // server-side — ignore
-          }
+          const ls =
+            typeof globalThis !== "undefined"
+              ? (globalThis as any).localStorage
+              : null;
           ls?.removeItem("sos_active_alert_id");
         } catch {
           // non-critical
@@ -352,7 +576,8 @@ export function EmergencyProvider({ children, role }: Props) {
   useEffect(() => {
     return () => {
       if (watchIdRef.current !== null) {
-        const nav = typeof navigator !== "undefined" ? (navigator as any) : null;
+        const nav =
+          typeof navigator !== "undefined" ? (navigator as any) : null;
         nav?.geolocation?.clearWatch(watchIdRef.current);
       }
       if (role === "user") {

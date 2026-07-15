@@ -1,10 +1,10 @@
 "use client";
 
 import { useEmergency } from "@/lib/emergency-context";
-import { Home, Hand, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Home, Hand, Loader2, CheckCircle, AlertCircle, Upload } from "lucide-react";
 
 export default function PanicButton() {
-  const { activeAlert, isTriggering, isStreaming, error, triggerSos, resolveAlert, startGpsStreaming, stopGpsStreaming, clearError } = useEmergency();
+  const { activeAlert, isTriggering, isStreaming, error, pendingCount, triggerSos, resolveAlert, startGpsStreaming, stopGpsStreaming, clearError } = useEmergency();
 
   const handleTrigger = async () => {
     if (isTriggering || activeAlert) return;
@@ -36,6 +36,13 @@ export default function PanicButton() {
           </div>
         </div>
 
+        {pendingCount > 0 && (
+          <div className="mt-4 flex items-center gap-2 rounded-full bg-amber-900/50 px-4 py-2 text-xs font-medium text-amber-200">
+            <Upload className="h-3 w-3 animate-pulse" />
+            {pendingCount} pending — syncing when online
+          </div>
+        )}
+
         <button
           type="button"
           onClick={handleResolve}
@@ -46,7 +53,7 @@ export default function PanicButton() {
 
         <p className="mt-4 flex items-center gap-2 text-sm font-medium tracking-wide text-gray-500">
           <Hand className="h-4 w-4" />
-          Alert #{activeAlert.id.slice(0, 8)} — Responders notified
+          Alert #{activeAlert.id.slice(0, 8)}
         </p>
       </div>
     );
@@ -59,6 +66,13 @@ export default function PanicButton() {
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
           <span className="flex-1">{error}</span>
           <button type="button" onClick={clearError} className="text-red-400 hover:text-red-600">&times;</button>
+        </div>
+      )}
+
+      {pendingCount > 0 && (
+        <div className="mb-4 flex items-center gap-2 rounded-full bg-amber-900/50 px-4 py-2 text-xs font-medium text-amber-200">
+          <Upload className="h-3 w-3 animate-pulse" />
+          {pendingCount} pending action{pendingCount !== 1 ? "s" : ""} — syncing when online
         </div>
       )}
 
