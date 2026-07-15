@@ -9,6 +9,7 @@ import {
   Users,
   LogOut,
 } from "lucide-react";
+import { EmergencyProvider } from "@/lib/emergency-context";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -24,6 +25,7 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   return (
+    <EmergencyProvider role="admin">
     <div className="flex min-h-screen bg-[#f6f7f8]">
       {/* Sidebar */}
       <aside className="fixed flex h-full w-64 flex-col bg-[#0b203c] text-white">
@@ -95,5 +97,6 @@ export default function AdminLayout({
       {/* Main content */}
       <main className="ml-64 flex-1 p-8">{children}</main>
     </div>
+    </EmergencyProvider>
   );
 }

@@ -15,116 +15,89 @@ import {
   UserPlus,
   CheckCircle,
   RefreshCw,
+  Navigation,
 } from "lucide-react";
+import { useEmergency } from "@/lib/emergency-context";
+import { useMemo } from "react";
 
 const AdminMap = dynamic(() => import("../components/AdminMap"), {
   ssr: false,
 });
 
-const kpis = [
-  {
-    icon: User,
-    iconBg: "bg-blue-50",
-    iconColor: "text-blue-600",
-    label: "Total Active Users",
-    value: "12,450",
-    trend: "+5%",
-    trendColor: "text-emerald-600",
-  },
-  {
-    icon: Award,
-    iconBg: "bg-emerald-50",
-    iconColor: "text-emerald-600",
-    label: "Responders Online",
-    value: "482",
-    trend: "+2%",
-    trendColor: "text-emerald-600",
-  },
-  {
-    icon: AlertTriangle,
-    iconBg: "bg-red-50",
-    iconColor: "text-red-600",
-    label: "Alerts Today",
-    value: "14",
-    trend: "3 Unresolved",
-    trendColor: "text-red-600",
-  },
-  {
-    icon: Timer,
-    iconBg: "bg-indigo-50",
-    iconColor: "text-indigo-600",
-    label: "Avg. Response Time",
-    value: "4m 12s",
-    trend: "-12s",
-    trendColor: "text-emerald-600",
-  },
-];
-
-const alerts = [
-  {
-    id: "#AL-402",
-    user: "Sarah Jenkins",
-    priority: "CRITICAL",
-    priorityClass: "bg-emergency text-white",
-    responder: "Officer Miller",
-    status: "In-Progress",
-    statusColor: "bg-orange-500",
-    action: "Dispatch",
-  },
-  {
-    id: "#AL-398",
-    user: "Robert Smith",
-    priority: "WARNING",
-    priorityClass: "bg-amber-100 text-amber-700",
-    responder: "EMS Team #4",
-    status: "En Route",
-    statusColor: "bg-blue-500",
-    action: "Details",
-  },
-  {
-    id: "#AL-395",
-    user: "Elena Cruz",
-    priority: "INFO",
-    priorityClass: "bg-blue-100 text-blue-700",
-    responder: "System Auto",
-    status: "Resolved",
-    statusColor: "bg-emerald-500",
-    action: "Logs",
-  },
-];
-
-const activity = [
-  {
-    icon: UserPlus,
-    iconBg: "bg-primary",
-    text: "New Responder Signed Up",
-    sub: "Mark Thompson (Badge #882)",
-    time: "2 minutes ago",
-  },
-  {
-    icon: CheckCircle,
-    iconBg: "bg-emerald-500",
-    text: "Alert #402 Resolved",
-    sub: "Dispatch: Central HQ",
-    time: "14 minutes ago",
-  },
-  {
-    icon: RefreshCw,
-    iconBg: "bg-blue-500",
-    text: "Firmware Update Pushed",
-    sub: "SafeBand v2.1.4 stable",
-    time: "1 hour ago",
-  },
-  {
-    icon: AlertTriangle,
-    iconBg: "bg-red-500",
-    text: "System Backup Warning",
-    sub: "S3 Storage at 85% capacity",
-    time: "2 hours ago",
-  },
-];
-
 export default function AdminDashboardPage() {
+  const { alerts, locations } = useEmergency();
+
+  const activeAlerts = useMemo(
+    () => alerts.filter((a) => a.status === "active"),
+    [alerts],
+  );
+
+  const resolvedCount = useMemo(
+    () => alerts.filter((a) => a.status === "resolved").length,
+    [alerts],
+  );
+
+  const incidents = useMemo(
+    () =>
+      activeAlerts.map((a) => {
+        const pts = locations.get(a.id);
+        const latest = pts?.[pts.length - 1];
+        const lat = latest?.latitude ?? 8.134521;
+        const lng = latest?.longitude ?? 4.246732;
+        const age =
+          (Date.now() - new Date(a.created_at).getTime()) / 60000;
+        const color =
+          age < 5 ? "#e10600" : age < 30 ? "#f59e0b" : "#3b82f6";
+        return {
+          alert_id: a.id,
+          lat,
+          lng,
+          label: a.victim_name || "Unknown",
+          color,
+        };
+      }),
+    [activeAlerts, locations],
+  );
+
+  const kpis = [
+    {
+      icon: User,
+      iconBg: "bg-blue-50",
+      iconColor: "text-blue-600",
+      label: "Active Users",
+      value: alerts.length > 0 ? `${alerts.length}+` : "—",
+      trend: `${activeAlerts.length} in distress`,
+      trendColor: activeAlerts.length > 0 ? "text-red-600" : "text-emerald-600",
+    },
+    {
+      icon: Award,
+      iconBg: "bg-emerald-50",
+      iconColor: "text-emerald-600",
+      label: "Responders Online",
+      value: "Active",
+      trend: "Receiving updates",
+      trendColor: "text-emerald-600",
+    },
+    {
+      icon: AlertTriangle,
+      iconBg: "bg-red-50",
+      iconColor: "text-red-600",
+      label: "Active Alerts",
+      value: String(activeAlerts.length),
+      trend: `${resolvedCount} resolved today`,
+      trendColor: resolvedCount > 0 ? "text-emerald-600" : "text-slate-400",
+    },
+    {
+      icon: Timer,
+      iconBg: "bg-indigo-50",
+      iconColor: "text-indigo-600",
+      label: "Alerts Total",
+      value: String(alerts.length),
+      trend: "Session lifetime",
+      trendColor: "text-slate-400",
+    },
+  ];
+
   return (
     <div>
       {/* Header */}
@@ -151,7 +124,9 @@ export default function AdminDashboardPage() {
             className="relative rounded-lg border border-slate-200 bg-white p-2"
           >
             <Bell className="h-5 w-5 text-slate-600" />
-            <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-white bg-emergency" />
+            {activeAlerts.length > 0 && (
+              <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-white bg-emergency" />
+            )}
           </button>
         </div>
       </header>
@@ -197,22 +172,13 @@ export default function AdminDashboardPage() {
                 Live Incident Map
               </h3>
               <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="rounded bg-primary-dark px-3 py-1 text-xs text-white"
-                >
-                  Users
-                </button>
-                <button
-                  type="button"
-                  className="rounded bg-slate-100 px-3 py-1 text-xs text-slate-600"
-                >
-                  Responders
-                </button>
+                <span className="rounded bg-primary-dark px-3 py-1 text-xs text-white">
+                  {incidents.length} incident{incidents.length !== 1 ? "s" : ""}
+                </span>
               </div>
             </div>
             <div className="h-96 bg-slate-100">
-              <AdminMap />
+              <AdminMap incidents={incidents} />
             </div>
           </div>
 
@@ -221,7 +187,7 @@ export default function AdminDashboardPage() {
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
               <h3 className="flex items-center gap-2 font-bold text-primary-dark">
                 <AlertTriangle className="h-5 w-5 text-emergency" />
-                Recent Emergency Events
+                Active Emergency Events
               </h3>
               <a
                 href="/admin/alerts"
@@ -231,67 +197,61 @@ export default function AdminDashboardPage() {
               </a>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-                  <tr>
-                    <th className="px-6 py-4 font-semibold">Alert ID</th>
-                    <th className="px-6 py-4 font-semibold">User</th>
-                    <th className="px-6 py-4 font-semibold">Priority</th>
-                    <th className="px-6 py-4 font-semibold">Responder</th>
-                    <th className="px-6 py-4 font-semibold">Status</th>
-                    <th className="px-6 py-4 text-right font-semibold">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-sm">
-                  {alerts.map((alert) => (
-                    <tr
-                      key={alert.id}
-                      className={
-                        alert.priority === "CRITICAL"
-                          ? "bg-red-50/30"
-                          : undefined
-                      }
-                    >
-                      <td className="px-6 py-4 font-medium text-slate-800">
-                        {alert.id}
-                      </td>
-                      <td className="px-6 py-4 text-slate-600">
-                        {alert.user}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`rounded px-2 py-1 text-[10px] font-bold ${alert.priorityClass}`}
-                        >
-                          {alert.priority}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600">
-                        {alert.responder}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`h-2 w-2 rounded-full ${alert.statusColor}`}
-                          />
-                          <span className="text-slate-600">
-                            {alert.status}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          type="button"
-                          className="text-xs font-bold uppercase text-primary-dark hover:text-emergency"
-                        >
-                          {alert.action}
-                        </button>
-                      </td>
+              {activeAlerts.length === 0 ? (
+                <div className="flex flex-col items-center gap-2 px-6 py-12 text-sm text-slate-400">
+                  <Map className="h-8 w-8" />
+                  <p>No active emergencies</p>
+                  <p className="text-xs">Waiting for incoming alerts…</p>
+                </div>
+              ) : (
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                    <tr>
+                      <th className="px-6 py-4 font-semibold">Alert ID</th>
+                      <th className="px-6 py-4 font-semibold">User</th>
+                      <th className="px-6 py-4 font-semibold">Status</th>
+                      <th className="px-6 py-4 font-semibold">Triggered</th>
+                      <th className="px-6 py-4 font-semibold">Location</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-sm">
+                    {activeAlerts.map((alert) => {
+                      const pts = locations.get(alert.id);
+                      const latest = pts?.[pts.length - 1];
+                      const time = new Date(alert.created_at).toLocaleTimeString();
+                      return (
+                        <tr
+                          key={alert.id}
+                          className="bg-red-50/30"
+                        >
+                          <td className="px-6 py-4 font-mono text-xs font-medium text-slate-800">
+                            {alert.id.slice(0, 8)}
+                          </td>
+                          <td className="px-6 py-4 text-slate-600">
+                            {alert.victim_name || "Unknown"}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="rounded bg-emergency px-2 py-1 text-[10px] font-bold text-white">
+                              ACTIVE
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-slate-600">{time}</td>
+                          <td className="px-6 py-4">
+                            {latest ? (
+                              <span className="flex items-center gap-1 text-xs text-slate-500">
+                                <Navigation className="h-3 w-3" />
+                                {Number(latest.latitude).toFixed(4)}, {Number(latest.longitude).toFixed(4)}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-slate-400">Awaiting GPS</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
@@ -322,28 +282,30 @@ export default function AdminDashboardPage() {
               <div>
                 <div className="mb-2 flex justify-between text-xs">
                   <span className="font-medium uppercase text-slate-500">
-                    GPS Relay Delay
+                    Socket Connection
                   </span>
-                  <span className="font-bold text-blue-600">0.4s</span>
+                  <span className="font-bold text-blue-600">Live</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-100">
                   <div
                     className="h-2 rounded-full bg-blue-600"
-                    style={{ width: "85%" }}
+                    style={{ width: "100%" }}
                   />
                 </div>
               </div>
               <div>
                 <div className="mb-2 flex justify-between text-xs">
                   <span className="font-medium uppercase text-slate-500">
-                    Server Load
+                    Active Alerts
                   </span>
-                  <span className="font-bold text-amber-600">42%</span>
+                  <span className="font-bold text-amber-600">
+                    {activeAlerts.length}
+                  </span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-100">
                   <div
                     className="h-2 rounded-full bg-amber-500"
-                    style={{ width: "42%" }}
+                    style={{ width: `${Math.min(activeAlerts.length * 20, 100)}%` }}
                   />
                 </div>
               </div>
@@ -357,32 +319,31 @@ export default function AdminDashboardPage() {
               System Stream
             </h3>
             <div className="relative space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
-              {activity.map((item, i) => {
-                const Icon = item.icon;
-                return (
-                  <div key={i} className="relative flex gap-4 pl-8">
-                    <div
-                      className={`absolute left-0 z-10 flex h-6 w-6 items-center justify-center rounded-full ring-4 ring-white ${item.iconBg}`}
-                    >
-                      <Icon className="h-3.5 w-3.5 text-white" />
+              {activeAlerts.length === 0 ? (
+                <div className="text-center text-xs text-slate-400">
+                  No recent activity
+                </div>
+              ) : (
+                activeAlerts.slice(0, 5).map((alert) => (
+                  <div key={alert.id} className="relative flex gap-4 pl-8">
+                    <div className="absolute left-0 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-emergency ring-4 ring-white">
+                      <AlertTriangle className="h-3.5 w-3.5 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-700">{item.text}</p>
-                      <p className="text-xs text-slate-400">{item.sub}</p>
+                      <p className="text-sm text-slate-700">
+                        New Emergency
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {alert.victim_name || "Unknown"} — Alert active
+                      </p>
                       <span className="text-[10px] text-slate-400">
-                        {item.time}
+                        {new Date(alert.created_at).toLocaleTimeString()}
                       </span>
                     </div>
                   </div>
-                );
-              })}
+                ))
+              )}
             </div>
-            <button
-              type="button"
-              className="mt-6 w-full border-t border-slate-50 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-colors hover:text-primary-dark"
-            >
-              View More Activity
-            </button>
           </div>
         </div>
       </div>
