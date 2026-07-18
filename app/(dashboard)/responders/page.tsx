@@ -103,7 +103,7 @@ function EditResponderModal({
     setError(null);
 
     startTransition(async () => {
-      const result = await updateResponder(responder.id, formData);
+      const result = await updateResponder(String(responder.id), formData);
       if (!result.success) {
         setError(result.error);
       } else {
@@ -288,7 +288,7 @@ function DeleteResponderModal({
 
   function handleConfirm() {
     startTransition(async () => {
-      const result = await deleteResponder(responder.id);
+      const result = await deleteResponder(String(responder.id));
       if (!result.success) {
         setError(result.error);
       } else {
@@ -441,7 +441,17 @@ export default function RespondersPage() {
             </div>
           )}
 
-          {!loading && !error && (
+          {!loading && !error && responders.length === 0 && (
+            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-white px-6 py-16 text-center">
+              <Users className="mb-3 h-12 w-12 text-slate-300" />
+              <h3 className="text-lg font-bold text-slate-700">No Responders Yet</h3>
+              <p className="mt-1 max-w-xs text-sm text-slate-500">
+                Add your first responder so they can receive emergency alerts and your live location when you trigger SOS.
+              </p>
+            </div>
+          )}
+
+          {!loading && !error && responders.length > 0 && (
             <div className="flex flex-col gap-4">
               {responders.map((responder) => {
                 const contact = responderContact(responder);

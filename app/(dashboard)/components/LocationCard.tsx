@@ -17,19 +17,16 @@ export default function LocationCard() {
 
     const onPosition = async (pos: any) => {
       setGpsActive(true);
-      const addr = await getCachedAddress(
-        pos.coords.latitude,
-        pos.coords.longitude,
-      );
+      const latitude = Number(pos.coords.latitude);
+      const longitude = Number(pos.coords.longitude);
+      const addr = await getCachedAddress(latitude, longitude);
       if (addr) {
         const lines = [addr.street, addr.city, addr.state, addr.country]
           .filter(Boolean)
           .join(", ");
         setAddress(lines || addr.display_name);
       } else {
-        setAddress(
-          `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
-        );
+        setAddress(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
       }
     };
 
@@ -72,9 +69,11 @@ export default function LocationCard() {
             </span>
           </div>
         </div>
-        <div className="bg-primary-dark/5 flex h-16 w-16 items-center justify-center rounded-lg text-xs text-gray-400">
-          Map
-        </div>
+        <img
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBc31eBKDAx5B69vAN0XbRqQvTP5X2mnHrHO_Jgyf-b1tL7-VDdXsHQ2j3WPunb3ZhyFg_0rERyT4p2yjofTVre5ShWiEBf21vXl_oYO3ceWFHrjOw9afT7ax4MXt6eMCG0mnYcHA16rGsq3ff1TgxDlyN5FHZ8Az-mbfJtqngdNP4dmoNwbzyo9Crs_9MdTisjHDxeZyP8WcXliAtm6IXJJcWEF_TUTlt2h8FT3h6fDNf_VdW2Ec2kM2Ac_OnUVZ5x8Q43lRWauQ"
+          alt="Map"
+          className="h-16 w-16 shrink-0 rounded-lg object-cover"
+        />
       </div>
     </div>
   );

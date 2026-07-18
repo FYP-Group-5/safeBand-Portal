@@ -166,9 +166,11 @@ export async function getInviter(
 }
 
 export async function updateResponder(
-  id: number,
-  data: InviteResponderRequest,
-): Promise<ActionError | { success: true; message: string }> {
+  id: string,
+  data: Partial<InviteResponderRequest>,
+): Promise<
+  ActionError | { success: true; message: string; data: Responder }
+> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get("session_token")?.value;
 
@@ -180,7 +182,7 @@ export async function updateResponder(
 
   try {
     response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/contacts/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/responders/${id}`,
       {
         method: "PUT",
         headers: {
@@ -200,6 +202,9 @@ export async function updateResponder(
   if (!response.ok) {
     try {
       const errorBody: ApiErrorResponse = await response.json();
+      if (response.status === 404) {
+        return { success: false, error: "Responder not found or unauthorized" };
+      }
       return { success: false, error: errorBody.message };
     } catch {
       return {
@@ -209,22 +214,23 @@ export async function updateResponder(
     }
   }
 
-  let result: InviteResponderSuccessResponse;
-
   try {
-    result = await response.json();
+    const result = await response.json();
+    return {
+      success: true,
+      message: result.message,
+      data: result.data,
+    };
   } catch {
     return {
       success: false,
       error: "An unexpected error occurred. Please try again.",
     };
   }
-
-  return { success: true, message: result.message };
 }
 
 export async function deleteResponder(
-  id: number,
+  id: string,
 ): Promise<ActionError | { success: true; message: string }> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get("session_token")?.value;
@@ -237,7 +243,7 @@ export async function deleteResponder(
 
   try {
     response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/contacts/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/responders/${id}`,
       {
         method: "DELETE",
         headers: {
@@ -255,6 +261,9 @@ export async function deleteResponder(
   if (!response.ok) {
     try {
       const errorBody: ApiErrorResponse = await response.json();
+      if (response.status === 404) {
+        return { success: false, error: "Responder not found or unauthorized" };
+      }
       return { success: false, error: errorBody.message };
     } catch {
       return {
