@@ -126,7 +126,7 @@ export async function activateResponder(
 }
 
 export async function getInviter(
-  userId: number,
+  userId: string,
 ): Promise<ActionError | { success: true; data: UserInfo }> {
   let response: Response;
 
@@ -231,7 +231,7 @@ export async function updateResponder(
 
 export async function deleteResponder(
   id: string,
-): Promise<ActionError | { success: true; message: string }> {
+): Promise<ActionError | { success: true; message: string; data: Responder }> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get("session_token")?.value;
 
@@ -275,7 +275,7 @@ export async function deleteResponder(
 
   try {
     const result = await response.json();
-    return { success: true, message: result.message };
+    return { success: true, message: result.message ?? "", data: result.data };
   } catch {
     return {
       success: false,

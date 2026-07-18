@@ -11,16 +11,15 @@ import {
   Loader2,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import Input from "@/components/ui/Input";
 import InviterCard from "@/components/responder/InviterCard";
-import ResponderActivateHeader from "../../../components/responder/ResponderActivateHeader";
+import ResponderActivateHeader from "../../../../components/responder/ResponderActivateHeader";
 import { activateResponder, getInviter } from "@/app/actions/responder";
 import type { UserInfo } from "@/types/responder";
 
 export default function ResponderActivatePage() {
-  const params = useParams<{ token: string }>();
-  const searchParams = useSearchParams();
+  const params = useParams<{ token: string; invitedBy: string }>();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -30,17 +29,21 @@ export default function ResponderActivatePage() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [inviter, setInviter] = useState<UserInfo | null>(null);
+  const [loadingInviter, setLoadingInviter] = useState(true);
 
   useEffect(() => {
-    const invitedBy = searchParams.get("invitedBy");
+    const invitedBy = params.invitedBy;
     if (invitedBy) {
-      getInviter(Number(invitedBy)).then((result) => {
+      getInviter(invitedBy).then((result) => {
         if (result.success) {
           setInviter(result.data);
         }
+        setLoadingInviter(false);
       });
+    } else {
+      setLoadingInviter(false);
     }
-  }, [searchParams]);
+  }, [params.invitedBy]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -100,12 +103,11 @@ export default function ResponderActivatePage() {
             </p>
           </div>
 
-          {inviter && (
-            <InviterCard
-              name={inviter.name}
-              email={inviter.email}
-            />
-          )}
+          <InviterCard
+            name={inviter?.name ?? ""}
+            email={inviter?.email ?? ""}
+            loading={loadingInviter}
+          />
 
           <form
             onSubmit={handleSubmit}

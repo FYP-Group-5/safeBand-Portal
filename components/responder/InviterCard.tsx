@@ -5,6 +5,22 @@ interface InviterCardProps {
   phoneNumber?: string;
   email?: string;
   imageUrl?: string;
+  loading?: boolean;
+}
+
+function Skeleton() {
+  return (
+    <div className="animate-pulse rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+      <div className="border-b border-slate-100 bg-slate-50/50 flex items-center gap-4 p-6">
+        <div className="size-14 shrink-0 rounded-full bg-slate-200" />
+        <div className="flex-1 space-y-2">
+          <div className="h-3 w-24 rounded bg-slate-200" />
+          <div className="h-5 w-40 rounded bg-slate-200" />
+          <div className="h-3 w-32 rounded bg-slate-200" />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function InviterCard({
@@ -12,7 +28,10 @@ export default function InviterCard({
   phoneNumber,
   email,
   imageUrl,
+  loading,
 }: InviterCardProps) {
+  if (loading) return <Skeleton />;
+
   return (
     <div className="rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
       <div className="border-b border-slate-100 bg-slate-50/50 flex items-center gap-4 p-6">
