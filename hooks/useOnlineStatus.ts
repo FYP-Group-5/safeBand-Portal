@@ -12,6 +12,7 @@ function getGlobal(): any {
 
 export function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState(true);
+  const [ready, setReady] = useState(false);
   const isOnlineRef = useRef(true);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export function useOnlineStatus() {
       setIsOnline(g.navigator.onLine);
       isOnlineRef.current = g.navigator.onLine;
     }
+    setReady(true);
 
     const goOnline = () => {
       setIsOnline(true);
@@ -43,5 +45,5 @@ export function useOnlineStatus() {
     };
   }, []);
 
-  return { isOnline, isOnlineRef };
+  return { isOnline, isOnlineRef, ready };
 }

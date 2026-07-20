@@ -67,7 +67,8 @@ export function EmergencyProvider({ children, role }: Props) {
 
   const watchIdRef = useRef<number | null>(null);
   const activeAlertRef = useRef<Alert | null>(null);
-  const { isOnline, isOnlineRef } = useOnlineStatus();
+  const isTriggeringRef = useRef(false);
+  const { isOnline, isOnlineRef, ready } = useOnlineStatus();
 
   const clearError = useCallback(() => {
     setState((s) => ({ ...s, error: null }));
@@ -337,7 +338,7 @@ export function EmergencyProvider({ children, role }: Props) {
 
   // ─── Flush offline queue when transitioning online ───────────────────────
   useEffect(() => {
-    if (!isOnline) return;
+    if (!isOnline || !ready) return;
 
     const items = getQueue();
     if (items.length === 0) return;
@@ -345,12 +346,12 @@ export function EmergencyProvider({ children, role }: Props) {
     let changed = false;
 
     (async () => {
-      for (const item of items) {
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
         try {
           if (item.type === "trigger_sos") {
             const res = await sosActions.triggerSos();
             if ("error" in res) {
-              // non-retriable or still offline — skip
               if (res.error.includes("connect") || res.error.includes("network")) {
                 continue;
               }
@@ -359,10 +360,20 @@ export function EmergencyProvider({ children, role }: Props) {
               continue;
             }
 
-            // Replace temp ID with real ID in queue
             if (item.tempAlertId) {
               replaceTempId(item.tempAlertId, res.alert.id);
-              // Update localStorage
+
+              // Patch remaining in-memory items so they use the real ID
+              for (let j = i + 1; j < items.length; j++) {
+                const later = items[j];
+                if (later.type === "log_location" && (later.payload as any).alert_id === item.tempAlertId) {
+                  (later.payload as any).alert_id = res.alert.id;
+                }
+                if (later.type === "resolve_alert" && (later.payload as any).alertId === item.tempAlertId) {
+                  (later.payload as any).alertId = res.alert.id;
+                }
+              }
+
               try {
                 const ls =
                   typeof globalThis !== "undefined"
@@ -374,7 +385,7 @@ export function EmergencyProvider({ children, role }: Props) {
               } catch {
                 // non-critical
               }
-              // Update activeAlert in state
+
               setState((s) => {
                 if (s.activeAlert?.id === item.tempAlertId) {
                   return { ...s, activeAlert: res.alert };
@@ -431,7 +442,7 @@ export function EmergencyProvider({ children, role }: Props) {
         );
       }
     })();
-  }, [isOnline, refreshPendingCount, pushToast]);
+  }, [isOnline, ready, refreshPendingCount, pushToast]);
 
   // ─── Read pending count on mount ────────────────────────────────────────
   useEffect(() => {
@@ -442,9 +453,36 @@ export function EmergencyProvider({ children, role }: Props) {
   const triggerSos = useCallback(async (): Promise<
     ActionError | { success: true; alert: Alert }
   > => {
+    if (isTriggeringRef.current) {
+      return { success: false, error: "Already triggering." };
+    }
+    isTriggeringRef.current = true;
+
     setState((s) => ({ ...s, isTriggering: true, error: null }));
 
     if (!isOnlineRef.current) {
+      // Check for an existing trigger_sos in the queue to avoid duplicates
+      const existingQ = getQueue();
+      const existingTrigger = existingQ.find((a) => a.type === "trigger_sos");
+      if (existingTrigger && existingTrigger.tempAlertId) {
+        const existingTemp: Alert = {
+          id: existingTrigger.tempAlertId,
+          user_id: "",
+          status: "active",
+          created_at: existingTrigger.createdAt,
+          ended_at: null,
+        };
+        setState((s) => ({
+          ...s,
+          isTriggering: false,
+          activeAlert: existingTemp,
+          pendingCount: getQueueLength(),
+        }));
+        activeAlertRef.current = existingTemp;
+        isTriggeringRef.current = false;
+        return { success: true as const, alert: existingTemp };
+      }
+
       // Offline — save locally
       const tempId = crypto.randomUUID();
       const tempAlert: Alert = {
@@ -479,12 +517,14 @@ export function EmergencyProvider({ children, role }: Props) {
         // non-critical
       }
 
+      isTriggeringRef.current = false;
       return { success: true as const, alert: tempAlert };
     }
 
     const res = await sosActions.triggerSos();
     if ("error" in res) {
       setState((s) => ({ ...s, isTriggering: false, error: res.error }));
+      isTriggeringRef.current = false;
       return res;
     }
     setState((s) => ({ ...s, isTriggering: false, activeAlert: res.alert }));
@@ -506,6 +546,7 @@ export function EmergencyProvider({ children, role }: Props) {
       // non-critical
     }
 
+    isTriggeringRef.current = false;
     return res;
   }, []);
 

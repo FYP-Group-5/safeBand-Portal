@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { EmergencyProvider } from "@/lib/emergency-context";
 import ToastContainer from "@/components/ui/ToastContainer";
+import { logout } from "@/app/actions/auth";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -88,6 +89,7 @@ export default function AdminLayout({
           </div>
           <button
             type="button"
+            onClick={() => logout()}
             className="flex w-full items-center justify-center gap-2 rounded py-2 text-xs text-white/70 transition-colors hover:bg-white/5 hover:text-white"
           >
             <LogOut className="h-4 w-4" />
