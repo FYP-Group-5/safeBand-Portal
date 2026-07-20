@@ -49,11 +49,19 @@ export default function MapView({
       wheelPxPerZoomLevel: 60,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-      maxZoom: 22,
-      subdomains: ["a", "b", "c", "d"],
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>, <a href="https://carto.com/">CARTO</a>',
-    }).addTo(map);
+    const maptilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY ?? "";
+    L.tileLayer(
+      `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${maptilerKey}`,
+      {
+        tileSize: 512,
+        zoomOffset: -1,
+        minZoom: 1,
+        maxZoom: 22,
+        attribution:
+          '&copy; <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+        crossOrigin: true,
+      },
+    ).addTo(map);
 
     map.setView([alertLat, alertLng], 14);
     mapInstanceRef.current = map;

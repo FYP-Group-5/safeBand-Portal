@@ -109,15 +109,16 @@ export function EmergencyProvider({ children, role }: Props) {
       setState((s) => ({ ...s, isStreaming: true }));
 
       const sendPosition = (lat: number, lng: number) => {
+        const currentAlertId = activeAlertRef.current?.id ?? alertId;
         const socket = getSocket();
         if (socket?.connected) {
           socket.emit("SOS_TRACKING", {
-            alert_id: alertId,
+            alert_id: currentAlertId,
             latitude: lat,
             longitude: lng,
           });
         } else if (isOnlineRef.current) {
-          sosActions.logLocation(alertId, lat, lng).then((res) => {
+          sosActions.logLocation(currentAlertId, lat, lng).then((res) => {
             if (!("data" in res)) {
               console.warn("[GPS] HTTP fallback failed:", (res as any).error);
             }
@@ -125,7 +126,7 @@ export function EmergencyProvider({ children, role }: Props) {
         } else {
           enqueue({
             type: "log_location",
-            payload: { alert_id: alertId, latitude: lat, longitude: lng },
+            payload: { alert_id: currentAlertId, latitude: lat, longitude: lng },
           });
           refreshPendingCount();
         }
