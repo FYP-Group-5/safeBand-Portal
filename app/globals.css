@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #2c5b4c;
+  --primary-dark: #0b203c;
+  --secondary: #8fb2a2;
+  --neutral: #f2f7f5;
+  --hero-background: #e0f2f1;
+  --background-light: #f6f7f8;
+  --background-dark: #121820;
+  --emergency: #e10600;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-background-light: var(--background-light);
+  --color-background-dark: var(--background-dark);
+  --color-emergency: var(--emergency);
+
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --primary: #0F172A;
+    --hero-background:#0a0a0a;
+    --secondary: #5E8C7E;
+    --neutral: #ffffff;
+  }
+} */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary shadow-primary/30 rounded-full px-10 py-5 text-lg font-bold text-white shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply rounded-full border border-slate-200 bg-white px-10 py-5 text-lg font-bold text-slate-700 transition-all hover:bg-slate-50;
+  }
+
+  .container-center {
+    @apply mx-auto max-w-6xl px-4;
+  }
+}
+
+@layer utilities {
+  .hero-pattern {
+    /* background-color: var(--background); */
+    background-color: var(--hero-background);
+    background-image: radial-gradient(#d1dbd4 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+  }
+
+  .soft-shadow {
+    box-shadow: 0 10px 30px -10px rgba(45, 90, 76, 0.1);
+  }
+
+  .connection-line {
+    background: linear-gradient(90deg, transparent, #5e8c7e 50%, transparent);
+    height: 2px;
+    width: 100%;
+  }
+}
