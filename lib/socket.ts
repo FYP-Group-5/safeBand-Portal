@@ -5,12 +5,22 @@ let socket: Socket | null = null;
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:8000";
 
-export function connectSocket(): Socket {
+export function connectSocket(explicitToken?: string): Socket {
   if (socket?.connected) return socket;
+
+  let token = explicitToken || "";
+  const g = globalThis as any;
+  if (!token && typeof g !== "undefined" && g.document && g.document.cookie) {
+    const match =
+      g.document.cookie.match(/(?:^|; )client_token=([^;]*)/) ||
+      g.document.cookie.match(/(?:^|; )session_token=([^;]*)/);
+    if (match) token = decodeURIComponent(match[1]);
+  }
 
   socket = io(SOCKET_URL, {
     withCredentials: true,
     transports: ["websocket"],
+    auth: { token },
   });
 
   socket.on("connect", () => {

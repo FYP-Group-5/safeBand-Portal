@@ -56,12 +56,14 @@ export async function login(data: LoginRequest): Promise<ActionError | void> {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     path: "/",
-    maxAge: 60 * 60 * 24 * 30, // 30 days
+    maxAge: 60 * 60 * 24 * 365, // 365 days (persistent emergency session)
   };
 
   const cookieStore = await cookies();
   cookieStore.set("session_token", result.token, cookieOptions);
   cookieStore.set("user_role", role, cookieOptions);
+  // Set non-httpOnly client_token so WebSocket handshake in browser can read token
+  cookieStore.set("client_token", result.token, { ...cookieOptions, httpOnly: false });
 
   const roleHome: Record<UserRole, string> = {
     admin: "/admin",
@@ -76,12 +78,18 @@ export async function logout() {
   const cookieStore = await cookies();
   cookieStore.delete("session_token");
   cookieStore.delete("user_role");
+  cookieStore.delete("client_token");
   redirect("/login");
 }
 
 export async function getSession() {
   const cookieStore = await cookies();
   return cookieStore.get("session_token");
+}
+
+export async function getAuthToken(): Promise<string> {
+  const cookieStore = await cookies();
+  return cookieStore.get("session_token")?.value || cookieStore.get("client_token")?.value || "";
 }
 
 export async function register(

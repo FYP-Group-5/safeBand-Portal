@@ -1,4 +1,7 @@
-import { Shield, Bell } from "lucide-react";
+"use client";
+
+import { Shield } from "lucide-react";
+import NotificationCenter from "@/components/NotificationCenter";
 
 export default function DashboardHeader() {
   return (
@@ -17,9 +20,7 @@ export default function DashboardHeader() {
               System: Ready
             </span>
           </div>
-          <button className="text-primary-dark">
-            <Bell className="h-6 w-6" />
-          </button>
+          <NotificationCenter />
         </div>
       </div>
     </header>

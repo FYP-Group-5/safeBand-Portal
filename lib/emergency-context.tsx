@@ -162,9 +162,9 @@ export function EmergencyProvider({ children, role }: Props) {
     setState((s) => ({ ...s, isStreaming: false }));
   }, []);
 
-  // ─── Restore active alert from localStorage (user) ──────────────────────
+  // ─── Restore active alert from localStorage (user / responder) ──────────────
   useEffect(() => {
-    if (role !== "user") return;
+    if (role !== "user" && role !== "responder") return;
 
     let ls: any = null;
     try {
@@ -225,9 +225,9 @@ export function EmergencyProvider({ children, role }: Props) {
     });
   }, [role, startGpsStreaming]);
 
-  // ─── Fetch active alerts on mount (responder/admin) ─────────────────────
+  // ─── Fetch active alerts on mount (all roles) ───────────────────────────
   useEffect(() => {
-    if (role === "user") return;
+    if (!role) return;
 
     sosActions.getActiveAlerts().then((res) => {
       if ("error" in res) return;
@@ -235,104 +235,112 @@ export function EmergencyProvider({ children, role }: Props) {
     });
   }, [role]);
 
-  // ─── Socket connection (responder/admin) ────────────────────────────────
+  // ─── Socket connection (all roles) ──────────────────────────────────────
   useEffect(() => {
-    if (role === "user") return;
+    if (!role) return;
 
-    const socket = connectSocket();
+    let socket: ReturnType<typeof connectSocket> | null = null;
 
-    const onConnect = () => {
-      joinRoom("emergency-responders");
-    };
+    import("@/app/actions/auth").then(({ getAuthToken }) => {
+      getAuthToken().then((token) => {
+        socket = connectSocket(token);
 
-    const onNewEmergency = (data: {
-      alert_id: string;
-      user_name: string;
-      timestamp: string;
-    }) => {
-      const newAlert: Alert = {
-        id: data.alert_id,
-        user_id: "",
-        status: "active",
-        created_at: data.timestamp,
-        ended_at: null,
-        victim_name: data.user_name,
-      };
-      setState((s) => {
-        if (s.alerts.some((a) => a.id === data.alert_id)) return s;
-        return { ...s, alerts: [newAlert, ...s.alerts] };
+        const onConnect = () => {
+          joinRoom("emergency-responders");
+        };
+
+        const onNewEmergency = (data: {
+          alert_id: string;
+          user_name: string;
+          timestamp: string;
+        }) => {
+          const newAlert: Alert = {
+            id: data.alert_id,
+            user_id: "",
+            status: "active",
+            created_at: data.timestamp,
+            ended_at: null,
+            victim_name: data.user_name,
+          };
+          setState((s) => {
+            if (s.alerts.some((a) => a.id === data.alert_id)) return s;
+            return { ...s, alerts: [newAlert, ...s.alerts] };
+          });
+          pushToast(
+            "🚨 New Emergency",
+            `${data.user_name} triggered an SOS alert`,
+            "emergency",
+          );
+        };
+
+        const onLocationUpdate = (data: any) => {
+          const pt: LocationPoint = {
+            id: data.id,
+            alert_id: data.alert_id,
+            latitude: Number(data.latitude),
+            longitude: Number(data.longitude),
+            created_at: data.created_at,
+          };
+          setState((s) => {
+            const next = new Map(s.locations);
+            const existing = next.get(pt.alert_id) || [];
+            next.set(pt.alert_id, [...existing, pt]);
+            return { ...s, locations: next };
+          });
+        };
+
+        const onUpdateMap = (data: any) => {
+          const pt: LocationPoint = {
+            id: "",
+            alert_id: data.alert_id,
+            latitude: Number(data.latitude),
+            longitude: Number(data.longitude),
+            created_at: data.timestamp,
+          };
+          setState((s) => {
+            const next = new Map(s.locations);
+            const existing = next.get(pt.alert_id) || [];
+            next.set(pt.alert_id, [...existing, pt]);
+            return { ...s, locations: next };
+          });
+        };
+
+        const onEmergencyResolved = (data: { alert_id: string }) => {
+          setState((s) => ({
+            ...s,
+            alerts: s.alerts.filter((a) => a.id !== data.alert_id),
+            activeAlert:
+              s.activeAlert?.id === data.alert_id ? null : s.activeAlert,
+          }));
+          if (activeAlertRef.current?.id === data.alert_id) {
+            activeAlertRef.current = null;
+            stopGpsStreaming();
+          }
+          pushToast(
+            "✅ Emergency Resolved",
+            `Alert ${data.alert_id.slice(0, 8)} has been resolved`,
+            "resolved",
+          );
+        };
+
+        socket.on("connect", onConnect);
+        socket.on("NEW_EMERGENCY", onNewEmergency);
+        socket.on("LOCATION_UPDATE", onLocationUpdate);
+        socket.on("UPDATE_MAP", onUpdateMap);
+        socket.on("EMERGENCY_RESOLVED", onEmergencyResolved);
+
+        if (socket.connected) onConnect();
       });
-      pushToast(
-        "🚨 New Emergency",
-        `${data.user_name} triggered an SOS alert`,
-        "emergency",
-      );
-    };
-
-    const onLocationUpdate = (data: any) => {
-      const pt: LocationPoint = {
-        id: data.id,
-        alert_id: data.alert_id,
-        latitude: Number(data.latitude),
-        longitude: Number(data.longitude),
-        created_at: data.created_at,
-      };
-      setState((s) => {
-        const next = new Map(s.locations);
-        const existing = next.get(pt.alert_id) || [];
-        next.set(pt.alert_id, [...existing, pt]);
-        return { ...s, locations: next };
-      });
-    };
-
-    const onUpdateMap = (data: any) => {
-      const pt: LocationPoint = {
-        id: "",
-        alert_id: data.alert_id,
-        latitude: Number(data.latitude),
-        longitude: Number(data.longitude),
-        created_at: data.timestamp,
-      };
-      setState((s) => {
-        const next = new Map(s.locations);
-        const existing = next.get(pt.alert_id) || [];
-        next.set(pt.alert_id, [...existing, pt]);
-        return { ...s, locations: next };
-      });
-    };
-
-    const onEmergencyResolved = (data: { alert_id: string }) => {
-      setState((s) => ({
-        ...s,
-        alerts: s.alerts.filter((a) => a.id !== data.alert_id),
-        activeAlert:
-          s.activeAlert?.id === data.alert_id ? null : s.activeAlert,
-      }));
-      if (activeAlertRef.current?.id === data.alert_id) {
-        activeAlertRef.current = null;
-        stopGpsStreaming();
-      }
-      pushToast(
-        "✅ Emergency Resolved",
-        `Alert ${data.alert_id.slice(0, 8)} has been resolved`,
-        "resolved",
-      );
-    };
-
-    socket.on("connect", onConnect);
-    socket.on("NEW_EMERGENCY", onNewEmergency);
-    socket.on("LOCATION_UPDATE", onLocationUpdate);
-    socket.on("UPDATE_MAP", onUpdateMap);
-    socket.on("EMERGENCY_RESOLVED", onEmergencyResolved);
-
-    if (socket.connected) onConnect();
+    });
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("NEW_EMERGENCY", onNewEmergency);
-      socket.off("LOCATION_UPDATE", onLocationUpdate);
-      socket.off("UPDATE_MAP", onUpdateMap);
-      socket.off("EMERGENCY_RESOLVED", onEmergencyResolved);
+      if (socket) {
+        socket.off("connect");
+        socket.off("NEW_EMERGENCY");
+        socket.off("LOCATION_UPDATE");
+        socket.off("UPDATE_MAP");
+        socket.off("EMERGENCY_RESOLVED");
+      }
     };
   }, [role, stopGpsStreaming, pushToast]);
 

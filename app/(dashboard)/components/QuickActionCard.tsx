@@ -1,3 +1,5 @@
+"use client";
+
 import { LucideIcon } from "lucide-react";
 
 interface QuickActionCardProps {
@@ -6,6 +8,7 @@ interface QuickActionCardProps {
   description: string;
   iconBgColor: string;
   iconTextColor: string;
+  onClick?: () => void;
 }
 
 export default function QuickActionCard({
@@ -14,9 +17,14 @@ export default function QuickActionCard({
   description,
   iconBgColor,
   iconTextColor,
+  onClick,
 }: QuickActionCardProps) {
   return (
-    <button className="hover:border-primary-dark/20 flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 text-left shadow-sm transition-colors">
+    <button
+      type="button"
+      onClick={onClick}
+      className="hover:border-primary-dark/20 flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 text-left shadow-sm transition-all active:scale-98 hover:shadow-md cursor-pointer"
+    >
       <div
         className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBgColor} ${iconTextColor}`}
       >

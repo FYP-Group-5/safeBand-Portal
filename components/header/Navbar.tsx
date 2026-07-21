@@ -83,7 +83,7 @@ export default function Navbar() {
             </a>
           ))}
           <div className="flex flex-col gap-3 border-t border-slate-100 pt-2">
-            <button className="text-primary hover:bg-primary/5 rounded-full px-5 py-2.5 text-left text-sm font-bold transition-all">
+            <button onClick={() => router.push('/login')} className="text-primary hover:bg-primary/5 rounded-full px-5 py-2.5 text-left text-sm font-bold transition-all">
               Login
             </button>
             <button className="bg-primary shadow-primary/20 hover:bg-primary/90 rounded-full px-7 py-3 text-sm font-bold text-white shadow-lg transition-all">
