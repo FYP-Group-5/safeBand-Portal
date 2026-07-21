@@ -169,10 +169,11 @@ export default function ResponderDashboardPage() {
           <button
             type="button"
             onClick={() => logout()}
-            className="flex items-center rounded-lg p-2 text-xs font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+            className="flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-600 hover:border-red-600 hover:text-white cursor-pointer"
             title="Log out"
           >
             <LogOut className="h-4 w-4" />
+            <span className="text-xs">Logout</span>
           </button>
         </div>
       </header>
