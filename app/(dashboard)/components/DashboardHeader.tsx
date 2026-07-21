@@ -1,7 +1,8 @@
 "use client";
 
-import { Shield } from "lucide-react";
+import { Shield, LogOut } from "lucide-react";
 import NotificationCenter from "@/components/NotificationCenter";
+import { logout } from "@/app/actions/auth";
 
 export default function DashboardHeader() {
   return (
@@ -13,14 +14,17 @@ export default function DashboardHeader() {
           </div>
           <h1 className="text-lg font-bold tracking-tight">SafeBand</h1>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1">
-            <span className="h-2 w-2 rounded-full bg-green-500"></span>
-            <span className="text-xs font-bold tracking-wider text-green-700 uppercase">
-              System: Ready
-            </span>
-          </div>
+        <div className="flex items-center gap-2.5">
           <NotificationCenter />
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 cursor-pointer"
+            title="Log out"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="text-xs">Logout</span>
+          </button>
         </div>
       </div>
     </header>
