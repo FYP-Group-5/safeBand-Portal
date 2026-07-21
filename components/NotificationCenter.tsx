@@ -179,8 +179,8 @@ export default function NotificationCenter() {
 
       {/* Notifications Drawer Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-end bg-black/40 backdrop-blur-xs p-4 sm:p-6">
-          <div className="flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-start justify-center sm:justify-end bg-black/40 backdrop-blur-xs p-2 sm:p-6">
+          <div className="flex max-h-[85vh] w-full max-w-full sm:max-w-md flex-col overflow-hidden rounded-t-2xl sm:rounded-2xl bg-white shadow-2xl border border-slate-100">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-100 bg-[#0b203c] px-5 py-4 text-white">
               <div className="flex items-center gap-2.5">

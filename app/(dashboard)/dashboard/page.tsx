@@ -55,7 +55,7 @@ export default function DashboardPage() {
     <section className="text-primary-dark bg-background-light flex min-h-screen flex-col overflow-x-hidden font-sans">
       <DashboardHeader />
 
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-24">
+      <main className="mx-auto flex w-full max-w-md sm:max-w-xl md:max-w-3xl flex-1 flex-col gap-6 overflow-y-auto px-4 pt-4 sm:pt-6 pb-24">
         {/* 🚨 Network Emergency Alert Card for Normal Users */}
         {activeNetworkAlert && (
           <div className="overflow-hidden rounded-2xl border-2 border-red-500 bg-white shadow-xl animate-pulse">

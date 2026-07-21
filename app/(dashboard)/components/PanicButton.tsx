@@ -80,14 +80,14 @@ export default function PanicButton() {
         <button
           type="button"
           disabled={isTriggering}
-          className="bg-emergency relative z-10 flex h-64 w-64 flex-col items-center justify-center rounded-full text-white shadow-2xl shadow-[0_0_0_10px_rgba(225,6,0,0.1),0_0_0_20px_rgba(225,6,0,0.05)] transition-transform active:scale-95 disabled:cursor-wait"
+          className="bg-emergency relative z-10 flex h-56 w-56 sm:h-64 sm:w-64 flex-col items-center justify-center rounded-full text-white shadow-2xl shadow-[0_0_0_10px_rgba(225,6,0,0.1),0_0_0_20px_rgba(225,6,0,0.05)] transition-transform active:scale-95 disabled:cursor-wait"
         >
           {isTriggering ? (
-            <Loader2 className="mb-2 h-16 w-16 animate-spin" />
+            <Loader2 className="mb-2 h-14 w-14 sm:h-16 sm:w-16 animate-spin" />
           ) : (
-            <Home className="mb-2 h-16 w-16 font-light" />
+            <Home className="mb-2 h-14 w-14 sm:h-16 sm:w-16 font-light" />
           )}
-          <span className="text-2xl font-black tracking-tighter">
+          <span className="text-xl sm:text-2xl font-black tracking-tighter">
             {isTriggering ? "TRIGGERING..." : "TAP TO ALERT"}
           </span>
           <div className="mt-4 h-1 w-24 overflow-hidden rounded-full bg-white/30">
