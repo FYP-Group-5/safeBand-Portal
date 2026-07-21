@@ -334,11 +334,13 @@ export function EmergencyProvider({ children, role }: Props) {
     });
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("NEW_EMERGENCY", onNewEmergency);
-      socket.off("LOCATION_UPDATE", onLocationUpdate);
-      socket.off("UPDATE_MAP", onUpdateMap);
-      socket.off("EMERGENCY_RESOLVED", onEmergencyResolved);
+      if (socket) {
+        socket.off("connect");
+        socket.off("NEW_EMERGENCY");
+        socket.off("LOCATION_UPDATE");
+        socket.off("UPDATE_MAP");
+        socket.off("EMERGENCY_RESOLVED");
+      }
     };
   }, [role, stopGpsStreaming, pushToast]);
 

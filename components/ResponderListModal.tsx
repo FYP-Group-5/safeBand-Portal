@@ -5,18 +5,10 @@ import { Users, X, Phone, ShieldCheck, Mail, Plus, Loader2 } from "lucide-react"
 import { getResponders } from "@/app/actions/responder";
 import { AddResponderButton } from "@/app/(dashboard)/components/AddResponderButton";
 
+import type { Responder } from "@/types/responder";
+
 interface ResponderListModalProps {
   onClose: () => void;
-}
-
-interface Responder {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  relationship?: string;
-  status: string;
-  created_at: string;
 }
 
 export default function ResponderListModal({ onClose }: ResponderListModalProps) {
@@ -26,8 +18,8 @@ export default function ResponderListModal({ onClose }: ResponderListModalProps)
   useEffect(() => {
     getResponders().then((res) => {
       setLoading(false);
-      if (res.success && res.responders) {
-        setResponders(res.responders);
+      if (res.success && res.data) {
+        setResponders(res.data);
       }
     });
   }, []);
@@ -93,7 +85,7 @@ export default function ResponderListModal({ onClose }: ResponderListModalProps)
                       <span className="text-slate-300">•</span>
                       <span
                         className={`text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                          item.status === "accepted"
+                          item.status === "verified" || (item.status as string) === "accepted"
                             ? "bg-emerald-100 text-emerald-700"
                             : "bg-amber-100 text-amber-700"
                         }`}

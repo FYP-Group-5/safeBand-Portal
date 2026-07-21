@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   CheckCircle2,
   Info,
-  ChevronRight,
 } from "lucide-react";
 import { useEmergency } from "@/lib/emergency-context";
 
@@ -36,58 +35,80 @@ const DEFAULT_NOTIFICATIONS: AppNotification[] = [
   },
 ];
 
+interface ClientStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+}
+
+function getLocalStorage(): ClientStorage | null {
+  try {
+    const g = globalThis as unknown as { window?: unknown; localStorage?: ClientStorage };
+    if (typeof g !== "undefined" && g.window && g.localStorage) {
+      return g.localStorage;
+    }
+  } catch {}
+  return null;
+}
+
+function getInitialNotifications(): AppNotification[] {
+  const storage = getLocalStorage();
+  if (!storage) return DEFAULT_NOTIFICATIONS;
+  try {
+    const saved = storage.getItem(STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+    storage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_NOTIFICATIONS));
+  } catch {}
+  return DEFAULT_NOTIFICATIONS;
+}
+
 export default function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const { alerts, activeAlert } = useEmergency();
+  const [notifications, setNotifications] = useState<AppNotification[]>(getInitialNotifications);
 
-  // Load notifications from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setNotifications(JSON.parse(saved));
-      } else {
-        setNotifications(DEFAULT_NOTIFICATIONS);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_NOTIFICATIONS));
-      }
-    } catch {
-      setNotifications(DEFAULT_NOTIFICATIONS);
-    }
-  }, []);
+  const { alerts } = useEmergency();
 
-  // Sync new emergency alerts into notification list
+  // Sync new emergency alerts into notification list asynchronously
   useEffect(() => {
     if (alerts.length === 0) return;
 
-    setNotifications((prev) => {
-      let updated = [...prev];
-      let changed = false;
+    const timer = setTimeout(() => {
+      setNotifications((prev) => {
+        let updated = [...prev];
+        let changed = false;
 
-      alerts.forEach((alert) => {
-        const notifId = `alert-${alert.id}`;
-        if (!updated.some((n) => n.id === notifId)) {
-          const newNotif: AppNotification = {
-            id: notifId,
-            title: `🚨 Emergency SOS: ${alert.victim_name || "Unknown User"}`,
-            message: `Emergency SOS triggered at ${new Date(alert.created_at).toLocaleTimeString()}. Real-time GPS active.`,
-            timestamp: alert.created_at,
-            type: alert.status === "active" ? "emergency" : "resolved",
-            read: false,
-          };
-          updated = [newNotif, ...updated];
-          changed = true;
+        alerts.forEach((alert) => {
+          const notifId = `alert-${alert.id}`;
+          if (!updated.some((n) => n.id === notifId)) {
+            const newNotif: AppNotification = {
+              id: notifId,
+              title: `🚨 Emergency SOS: ${alert.victim_name || "Unknown User"}`,
+              message: `Emergency SOS triggered at ${new Date(alert.created_at).toLocaleTimeString()}. Real-time GPS active.`,
+              timestamp: alert.created_at,
+              type: alert.status === "active" ? "emergency" : "resolved",
+              read: false,
+            };
+            updated = [newNotif, ...updated];
+            changed = true;
+          }
+        });
+
+        if (changed) {
+          const storage = getLocalStorage();
+          if (storage) {
+            try {
+              storage.setItem(STORAGE_KEY, JSON.stringify(updated.slice(0, 50)));
+            } catch {}
+          }
+          return updated;
         }
+
+        return prev;
       });
+    }, 0);
 
-      if (changed) {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated.slice(0, 50)));
-        } catch {}
-      }
-
-      return updated;
-    });
+    return () => clearTimeout(timer);
   }, [alerts]);
 
   const unreadCount = useMemo(
@@ -97,8 +118,10 @@ export default function NotificationCenter() {
 
   const saveNotifications = (items: AppNotification[]) => {
     setNotifications(items);
+    const storage = getLocalStorage();
+    if (!storage) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      storage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch {}
   };
 
@@ -143,12 +166,12 @@ export default function NotificationCenter() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="relative flex items-center justify-center rounded-lg p-2 text-slate-700 transition-colors hover:bg-slate-100 dark:text-white"
+        className="relative flex items-center justify-center rounded-lg p-2 text-slate-700 transition-colors hover:bg-slate-100 dark:text-white cursor-pointer"
         aria-label="View notifications"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-black text-white shadow-sm animate-pulse">
+          <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-black text-white shadow-xs animate-pulse">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -224,7 +247,7 @@ export default function NotificationCenter() {
                           {item.title}
                         </h4>
                         <span className="text-[10px] font-medium text-slate-400 shrink-0">
-                          {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(item.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </span>
                       </div>
                       <p className="mt-0.5 text-xs text-slate-600 line-clamp-2 leading-relaxed">

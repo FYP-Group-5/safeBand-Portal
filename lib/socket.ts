@@ -9,10 +9,11 @@ export function connectSocket(explicitToken?: string): Socket {
   if (socket?.connected) return socket;
 
   let token = explicitToken || "";
-  if (!token && typeof document !== "undefined") {
+  const g = globalThis as any;
+  if (!token && typeof g !== "undefined" && g.document && g.document.cookie) {
     const match =
-      document.cookie.match(/(?:^|; )client_token=([^;]*)/) ||
-      document.cookie.match(/(?:^|; )session_token=([^;]*)/);
+      g.document.cookie.match(/(?:^|; )client_token=([^;]*)/) ||
+      g.document.cookie.match(/(?:^|; )session_token=([^;]*)/);
     if (match) token = decodeURIComponent(match[1]);
   }
 
